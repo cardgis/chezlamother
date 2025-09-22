@@ -1,0 +1,49 @@
+# Dependencies
+next-app/node_modules/
+next-app/.next/
+next-app/out/
+
+# Environment variables
+next-app/.env
+next-app/.env.local
+next-app/.env.production
+next-app/.env.staging
+
+# Database
+next-app/prisma/dev.db*
+next-app/sqlite-backup.json
+
+# Build outputs
+next-app/dist/
+next-app/build/
+
+# Logs
+next-app/npm-debug.log*
+next-app/yarn-debug.log*
+next-app/yarn-error.log*
+
+# Runtime data
+next-app/pids
+next-app/*.pid
+next-app/*.seed
+next-app/*.pid.lock
+
+# Coverage directory used by tools like istanbul
+next-app/coverage/
+next-app/.nyc_output
+
+# VS Code
+.vscode/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
