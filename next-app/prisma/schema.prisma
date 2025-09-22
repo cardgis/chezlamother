@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id           Int      @id @default(autoincrement())
+  slug         String   @unique
+  name         String
+  description  String
+  price        Int
+  category     String
+  subcategory  String
+  dayAvailable String?  // Pour les plats midi (lundi, mardi, etc.)
+  available    Boolean  @default(true)
+  image        String?
+  rating       Float?
+  reviews      Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  orderItems   OrderItem[]
+
+  @@map("products")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("client") // "admin" ou "client"
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders    Order[]
+
+  @@map("users")
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  userId     Int?
+  user       User?       @relation(fields: [userId], references: [id])
+  
+  // Informations client (pour les commandes sans compte)
+  customerName  String?
+  customerEmail String?
+  customerPhone String?
+  
+  // Informations de livraison
+  deliveryAddress String?
+  deliveryTime    String?
+  
+  // Statut et montants
+  status     String      @default("pending") // pending, confirmed, preparing, delivered, cancelled
+  totalAmount Int
+  
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  // Relations
+  orderItems OrderItem[]
+  payments   Payment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  
+  quantity  Int
+  unitPrice Int
+  
+  createdAt DateTime @default(now())
+
+  @@map("order_items")
+}
+
+model Payment {
+  id              Int      @id @default(autoincrement())
+  orderId         Int
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  // Informations Wave
+  waveTransactionId String?  @unique
+  waveQrCode       String?   // QR code généré par Wave
+  wavePaymentUrl   String?   // URL de paiement Wave
+  
+  // Montants
+  amount           Int
+  currency         String   @default("XOF") // Franc CFA
+  
+  // Statut du paiement
+  status           String   @default("pending") // pending, processing, completed, failed, cancelled
+  paymentMethod    String   @default("wave")    // wave, cash, card
+  
+  // Métadonnées
+  waveReference    String?   // Référence Wave
+  waveCallback     String?   // URL de callback
+  
+  // Horodatage
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  paidAt           DateTime?
+
+  @@map("payments")
+}
+
+model ResetToken {
+  id        Int      @id @default(autoincrement())
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("reset_tokens")
+}
