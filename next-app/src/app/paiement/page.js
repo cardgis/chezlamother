@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import PaymentModal from '../../components/PaymentModal';
+import WaveQRPayment from '../../components/WaveQRPayment';
 import { cart } from '../../utils/cart';
 
 export default function PaymentPage() {
@@ -12,7 +12,7 @@ export default function PaymentPage() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showQRPayment, setShowQRPayment] = useState(false);
 
   useEffect(() => {
     if (orderId) {
@@ -51,8 +51,8 @@ export default function PaymentPage() {
     router.push(`/order-status?id=${order.id}&status=success`);
   };
 
-  const handleClosePayment = () => {
-    setShowPaymentModal(false);
+  const handleCloseQRPayment = () => {
+    setShowQRPayment(false);
     // Rediriger vers la page d'accueil ou le panier
     router.push('/');
   };
@@ -166,36 +166,60 @@ export default function PaymentPage() {
             </div>
           )}
 
-          {/* Bouton de paiement */}
+          {/* Bouton de paiement Wave QR */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="text-center">
               <h3 className="text-lg font-semibold mb-4">
-                Paiement sécurisé avec Wave
+                💳 Paiement Wave
               </h3>
               <p className="text-gray-600 mb-6">
-                Payez facilement avec votre application Wave en scannant le QR code
+                Scannez le QR code avec votre application Wave pour payer instantanément
               </p>
-              <button
-                onClick={() => setShowPaymentModal(true)}
-                className="bg-yellow-500 text-white px-8 py-3 rounded-lg hover:bg-yellow-600 transition-colors text-lg font-medium"
-              >
-                Payer avec Wave
-              </button>
-              <p className="text-sm text-gray-500 mt-4">
-                Paiement 100% sécurisé • Confirmation instantanée
-              </p>
+              
+              <div className="space-y-4">
+                <button
+                  onClick={() => setShowQRPayment(true)}
+                  className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-8 py-4 rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all text-lg font-medium shadow-lg transform hover:scale-105"
+                >
+                  📱 Payer avec QR Code Wave
+                </button>
+                
+                <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Paiement sécurisé
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                    Confirmation instantanée
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-semibold text-blue-800 mb-2">📋 Instructions rapides :</h4>
+                <ol className="text-sm text-blue-700 text-left space-y-1">
+                  <li>1. 📱 Ouvrez votre application Wave</li>
+                  <li>2. 📷 Cliquez sur "Scanner" ou "QR Code"</li>
+                  <li>3. 🎯 Pointez votre caméra vers le QR code</li>
+                  <li>4. ✅ Confirmez le paiement de {formatPrice(order?.totalAmount || 0)}</li>
+                </ol>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modal de paiement */}
-      {order && (
-        <PaymentModal
+      {/* Modal QR Code Wave */}
+      {order && showQRPayment && (
+        <WaveQRPayment
           order={order}
-          isOpen={showPaymentModal}
-          onClose={handleClosePayment}
           onPaymentSuccess={handlePaymentSuccess}
+          onClose={handleCloseQRPayment}
         />
       )}
     </div>

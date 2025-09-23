@@ -72,14 +72,36 @@ const Header = () => {
               </button>
             </li>
             {user ? (
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold"
-                >
-                  Déconnexion
-                </button>
-              </li>
+              <>
+                {user.role === 'admin' && (
+                  <li>
+                    <a 
+                      href="/admin/payments" 
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                    >
+                      💳 Paiements
+                    </a>
+                  </li>
+                )}
+                {user.role === 'admin' && (
+                  <li>
+                    <a 
+                      href="/admin/orders" 
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                    >
+                      🍽️ Cuisine
+                    </a>
+                  </li>
+                )}
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold"
+                  >
+                    Déconnexion
+                  </button>
+                </li>
+              </>
             ) : (
               <li>
                 <a href="/auth/login" className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition-colors font-semibold">Connexion</a>
