@@ -10,7 +10,7 @@ Application complète de commande en ligne pour restaurant sénégalais avec int
 - 📱 **Responsive** : Interface adaptée mobile et desktop
 - 👨‍💼 **Panel Admin** : Gestion des commandes et des statuts
 - 🗺️ **Géolocalisation** : Cartes Google Maps et Leaflet
-- 📧 **Notifications** : Email (SendGrid) et SMS (Twilio)
+- 📧 **Notifications** : Email (SendGrid)
 - 🗄️ **Base de données** : Prisma ORM avec PostgreSQL (Neon)
 
 ## 🚀 Tech Stack
@@ -18,10 +18,10 @@ Application complète de commande en ligne pour restaurant sénégalais avec int
 - **Frontend** : Next.js 15, React 19, TailwindCSS
 - **Backend** : Next.js API Routes, Prisma ORM
 - **Base de données** : PostgreSQL (Neon Database)
-- **Paiement** : Wave Senegal API
+- **Paiement** : Wave Senegal API avec QR Code
 - **Déploiement** : Vercel
 - **Authentification** : JWT + bcryptjs
-- **Email/SMS** : SendGrid, Twilio
+- **Email** : SendGrid
 
 ## 📦 Installation
 
@@ -55,9 +55,6 @@ JWT_SECRET="votre-secret-jwt"
 NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 WAVE_API_KEY="votre-cle-wave"
 WAVE_SECRET="votre-secret-wave"
-TWILIO_ACCOUNT_SID="votre-twilio-sid"
-TWILIO_AUTH_TOKEN="votre-twilio-token"
-TWILIO_PHONE="votre-numero-twilio"
 SENDGRID_API_KEY="votre-cle-sendgrid"
 ```
 

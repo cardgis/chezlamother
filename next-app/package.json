@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
+    "build-ignore-lint": "ESLINT_NO_DEV_ERRORS=true next build --turbopack",
     "start": "next start",
     "lint": "eslint"
   },
@@ -14,6 +15,7 @@
     "@sendgrid/mail": "^8.1.5",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.2",
+    "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "next": "15.5.2",
     "prisma": "^6.16.2",
@@ -23,7 +25,6 @@
     "react-icons": "^5.5.0",
     "react-leaflet": "^5.0.0",
     "resend": "^6.0.2",
-    "twilio": "^5.9.0",
     "uuid": "^12.0.0"
   },
   "devDependencies": {

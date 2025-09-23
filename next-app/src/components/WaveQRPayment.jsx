@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 
 export default function WaveQRPayment({ order, onPaymentSuccess, onClose }) {
   const [paymentStatus, setPaymentStatus] = useState('pending'); // 'pending', 'checking', 'confirmed'
@@ -143,7 +143,7 @@ export default function WaveQRPayment({ order, onPaymentSuccess, onClose }) {
         {/* QR Code */}
         <div className="text-center mb-6">
           <div className="bg-white p-4 rounded-lg border-2 border-gray-200 inline-block">
-            <QRCode 
+            <QRCodeCanvas 
               value={waveQRData}
               size={200}
               level="M"

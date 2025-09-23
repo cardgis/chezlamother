@@ -40,9 +40,6 @@ JWT_SECRET=votre-jwt-secret-tres-long-et-securise
 NEXT_PUBLIC_BASE_URL=https://votre-domaine-vercel.app
 WAVE_API_KEY=votre-cle-wave
 WAVE_SECRET=votre-secret-wave
-TWILIO_ACCOUNT_SID=votre-twilio-sid
-TWILIO_AUTH_TOKEN=votre-twilio-token
-TWILIO_PHONE=votre-numero-twilio
 SENDGRID_API_KEY=votre-cle-sendgrid
 ```
 

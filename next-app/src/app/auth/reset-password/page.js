@@ -1,9 +1,9 @@
 
 "use client";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get("token") || "";
@@ -129,4 +129,12 @@ export default function ResetPasswordPage() {
       )}
     </div>
   );
-  }
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
