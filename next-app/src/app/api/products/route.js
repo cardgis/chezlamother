@@ -3,7 +3,10 @@ import { Pool } from 'pg';
 // Client PostgreSQL direct pour Neon (plus fiable que Prisma)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
 });
 
 // Fonction pour créer une description courte
@@ -24,7 +27,11 @@ function createShortDescription(description, maxLength = 80) {
 
 export async function GET() {
   try {
+    console.log('🔌 Tentative de connexion à la base de données...');
+    console.log('📋 DATABASE_URL disponible:', !!process.env.DATABASE_URL);
+    
     const client = await pool.connect();
+    console.log('✅ Connexion établie');
     
     const result = await client.query(`
       SELECT id, slug, name, description, price, category, subcategory, 
@@ -34,6 +41,7 @@ export async function GET() {
       ORDER BY id ASC
     `);
     
+    console.log(`📊 ${result.rows.length} produits récupérés`);
     client.release();
     
     // Ajouter shortDescription à chaque produit
@@ -47,7 +55,12 @@ export async function GET() {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('Erreur lors de la récupération des produits:', error);
+    console.error('❌ Erreur lors de la récupération des produits:', error);
+    console.error('📋 Détails de l\'erreur:', {
+      message: error.message,
+      code: error.code,
+      stack: error.stack?.substring(0, 500)
+    });
     return new Response(
       JSON.stringify({ error: 'Erreur lors de la récupération des produits' }), 
       { 
