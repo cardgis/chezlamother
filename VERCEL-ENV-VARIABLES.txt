@@ -9,7 +9,7 @@ DATABASE_URL=postgresql://username:password@ep-host.us-east-1.aws.neon.tech/dbna
 # ================================================================
 # 🔐 AUTHENTIFICATION & SÉCURITÉ
 # ================================================================
-JWT_SECRET=super-secret-jwt-key-production-2025-chezlamother-secure-changez-moi
+JWT_SECRET=chezlamother_prod_3b7f32871cbd33e85769757fddec7885c022686fe5b682558fcd95284ff37604
 NEXT_PUBLIC_BASE_URL=https://VOTRE-DOMAINE-VERCEL.vercel.app
 
 # ================================================================
