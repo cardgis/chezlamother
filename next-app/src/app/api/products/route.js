@@ -61,38 +61,32 @@ export async function GET() {
 export async function PUT(request) {
   try {
     const products = await request.json();
+    const client = await pool.connect();
     
-    // Mettre à jour chaque produit
+    // Mettre à jour chaque produit avec PostgreSQL direct
     for (const product of products) {
-      await prisma.product.upsert({
-        where: { id: product.id },
-        update: {
-          name: product.name,
-          description: product.description,
-          price: product.price,
-          category: product.category,
-          subcategory: product.subcategory,
-          dayAvailable: product.dayAvailable || null,
-          available: product.available !== false,
-          image: product.image || null,
-          rating: product.rating || null,
-          reviews: product.reviews || null,
-        },
-        create: {
-          slug: product.slug,
-          name: product.name,
-          description: product.description,
-          price: product.price,
-          category: product.category,
-          subcategory: product.subcategory,
-          dayAvailable: product.dayAvailable || null,
-          available: product.available !== false,
-          image: product.image || null,
-          rating: product.rating || null,
-          reviews: product.reviews || null,
-        },
-      });
+      await client.query(`
+        UPDATE products 
+        SET name = $1, description = $2, price = $3, category = $4, 
+            subcategory = $5, "dayAvailable" = $6, available = $7, 
+            image = $8, rating = $9, reviews = $10, "updatedAt" = NOW()
+        WHERE id = $11
+      `, [
+        product.name,
+        product.description,
+        product.price,
+        product.category,
+        product.subcategory,
+        product.dayAvailable || null,
+        product.available !== false,
+        product.image || null,
+        product.rating || null,
+        product.reviews || null,
+        product.id
+      ]);
     }
+    
+    client.release();
     
     return new Response(JSON.stringify({ success: true }), { 
       status: 200,

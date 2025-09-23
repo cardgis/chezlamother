@@ -4,6 +4,7 @@ export default function ProductAvailabilityAdmin() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [updatingProducts, setUpdatingProducts] = useState(new Set());
 
   useEffect(() => {
     fetch('/api/products')
@@ -18,16 +19,51 @@ export default function ProductAvailabilityAdmin() {
       });
   }, []);
 
-  const handleToggleAvailability = (id) => {
+  const handleToggleAvailability = async (id) => {
+    const productToUpdate = products.find(p => p.id === id);
+    const newAvailability = !productToUpdate.available;
+    
+    // Marquer comme en cours de mise à jour
+    setUpdatingProducts(prev => new Set([...prev, id]));
+    
+    // Mise à jour optimiste de l'UI
     const updatedProducts = products.map(p =>
-      p.id === id ? { ...p, available: !p.available } : p
+      p.id === id ? { ...p, available: newAvailability } : p
     );
     setProducts(updatedProducts);
-    fetch('/api/products', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedProducts)
-    });
+    
+    try {
+      // Utiliser la nouvelle API spécialisée
+      const response = await fetch('/api/products/availability', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, available: newAvailability })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Erreur de mise à jour');
+      }
+      
+      console.log(`✅ ${result.product.name} ${result.product.available ? 'activé' : 'désactivé'}`);
+      
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
+      // Revenir à l'état précédent en cas d'erreur
+      const revertedProducts = products.map(p =>
+        p.id === id ? { ...p, available: productToUpdate.available } : p
+      );
+      setProducts(revertedProducts);
+      alert(`Erreur: ${error.message}`);
+    } finally {
+      // Retirer de la liste des mises à jour
+      setUpdatingProducts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
   };
 
   if (loading) return <div>Chargement...</div>;
@@ -51,14 +87,17 @@ export default function ProductAvailabilityAdmin() {
             </div>
             <div className="font-semibold text-base mb-1 text-center line-clamp-2">{product.name}</div>
             <div className="text-green-700 font-bold text-sm mb-2">{product.price?.toLocaleString('fr-FR')} F</div>
-            <label className="flex items-center gap-2 mt-2 cursor-pointer">
+            <label className={`flex items-center gap-2 mt-2 ${updatingProducts.has(product.id) ? 'cursor-wait opacity-60' : 'cursor-pointer'}`}>
               <input
                 type="checkbox"
                 checked={product.available}
                 onChange={() => handleToggleAvailability(product.id)}
-                className="w-5 h-5 accent-green-700 transition-all duration-200"
+                disabled={updatingProducts.has(product.id)}
+                className="w-5 h-5 accent-green-700 transition-all duration-200 disabled:cursor-wait"
               />
-              <span className={`text-sm font-medium ${product.available ? 'text-green-700' : 'text-red-500'}`}>{product.available ? 'Disponible' : 'Indisponible'}</span>
+              <span className={`text-sm font-medium ${product.available ? 'text-green-700' : 'text-red-500'}`}>
+                {updatingProducts.has(product.id) ? '🔄 Mise à jour...' : (product.available ? 'Disponible' : 'Indisponible')}
+              </span>
             </label>
           </div>
         ))}
