@@ -1,16 +1,14 @@
 {
   "version": 2,
   "name": "chezlamother",
-  "builds": [
-    {
-      "src": "next-app/package.json",
-      "use": "@vercel/next"
-    }
-  ],
+  "buildCommand": "cd next-app && npm run build",
+  "outputDirectory": "next-app/.next",
+  "installCommand": "cd next-app && npm install",
+  "devCommand": "cd next-app && npm run dev",
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "next-app/$1"
+      "dest": "/next-app/$1"
     }
   ],
   "env": {
