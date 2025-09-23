@@ -1,0 +1,29 @@
+# 🔐 VARIABLES D'ENVIRONNEMENT POUR VERCEL
+# Copiez ces variables dans Vercel Dashboard → Settings → Environment Variables
+
+# ================================================================
+# 🗄️ BASE DE DONNÉES NEON POSTGRESQL
+# ================================================================
+DATABASE_URL=postgresql://username:password@ep-host.us-east-1.aws.neon.tech/dbname?sslmode=require
+
+# ================================================================
+# 🔐 AUTHENTIFICATION & SÉCURITÉ
+# ================================================================
+JWT_SECRET=super-secret-jwt-key-production-2025-chezlamother-secure-changez-moi
+NEXT_PUBLIC_BASE_URL=https://VOTRE-DOMAINE-VERCEL.vercel.app
+
+# ================================================================
+# 💳 WAVE PAYMENT API (SENEGAL)
+# ================================================================
+WAVE_API_KEY=votre-cle-wave-api-production
+WAVE_SECRET=votre-secret-wave-production
+
+# ================================================================
+# 📧 SENDGRID POUR LES EMAILS
+# ================================================================
+SENDGRID_API_KEY=votre-cle-sendgrid-production
+
+# ================================================================
+# 🌍 ENVIRONNEMENT
+# ================================================================
+NODE_ENV=production

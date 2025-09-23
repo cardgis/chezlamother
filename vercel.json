@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "name": "chezlamother",
+  "builds": [
+    {
+      "src": "next-app/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "next-app/$1"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_BASE_URL": "https://chezlamother.vercel.app"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}
