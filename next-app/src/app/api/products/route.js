@@ -1,4 +1,10 @@
-import prisma from '../../../lib/prisma';
+import { Pool } from 'pg';
+
+// Client PostgreSQL direct pour Neon (plus fiable que Prisma)
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
 // Fonction pour créer une description courte
 function createShortDescription(description, maxLength = 80) {
@@ -18,14 +24,20 @@ function createShortDescription(description, maxLength = 80) {
 
 export async function GET() {
   try {
-    const products = await prisma.product.findMany({
-      orderBy: {
-        id: 'asc'
-      }
-    });
+    const client = await pool.connect();
+    
+    const result = await client.query(`
+      SELECT id, slug, name, description, price, category, subcategory, 
+             "dayAvailable", available, image, rating, reviews, 
+             "createdAt", "updatedAt"
+      FROM products 
+      ORDER BY id ASC
+    `);
+    
+    client.release();
     
     // Ajouter shortDescription à chaque produit
-    const productsWithShortDesc = products.map(product => ({
+    const productsWithShortDesc = result.rows.map(product => ({
       ...product,
       shortDescription: createShortDescription(product.description)
     }));
