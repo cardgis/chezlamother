@@ -53,8 +53,10 @@ function PaymentPageContent() {
 
   const handleCloseQRPayment = () => {
     setShowQRPayment(false);
-    // Rediriger vers la page d'accueil ou le panier
-    router.push('/');
+    // Attendre un peu avant la redirection pour éviter les conflits
+    setTimeout(() => {
+      router.push('/');
+    }, 100);
   };
 
   const formatPrice = (price) => {
