@@ -117,24 +117,24 @@ export async function POST(request) {
 
     // Créer les items de la commande
     if (orderData.items && orderData.items.length > 0) {
-      const itemsQuery = `
-        INSERT INTO order_items ("orderId", "productId", quantity, "unitPrice", "createdAt")
-        VALUES ${orderData.items.map((_, index) => 
-          `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${index * 5 + 4}, NOW())`
-        ).join(', ')}
-        RETURNING *
-      `;
+      for (const item of orderData.items) {
+        const itemQuery = `
+          INSERT INTO order_items ("orderId", "productId", quantity, "unitPrice", "createdAt")
+          VALUES ($1, $2, $3, $4, NOW())
+          RETURNING *
+        `;
 
-      const itemsValues = orderData.items.flatMap(item => [
-        order.id,
-        item.productId,
-        item.quantity,
-        Math.round(parseFloat(item.unitPrice) * 100) // Convertir en centimes
-      ]);
+        const itemValues = [
+          order.id,
+          item.productId,
+          item.quantity,
+          Math.round(parseFloat(item.unitPrice) * 100) // Convertir en centimes
+        ];
 
-      const itemsResult = await client.query(itemsQuery, itemsValues);
+        await client.query(itemQuery, itemValues);
+      }
       
-      console.log('✅ Items créés:', itemsResult.rows.length);
+      console.log('✅ Items créés:', orderData.items.length);
     }
 
     // Confirmer la transaction
