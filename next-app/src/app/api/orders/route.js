@@ -1,95 +1,200 @@
-import prisma from '../../../lib/prisma';
+import { NextResponse } from 'next/server';
+import { Pool } from 'pg';
+
+// Client PostgreSQL direct pour Neon
+const NEON_DB_URL = 'postgres://default:UpPh5bCk6iSZ@ep-snowy-union-a4t26bx0-pooler.us-east-1.aws.neon.tech/verceldb?pgbouncer=true&connect_timeout=15&sslmode=require';
+
+const pool = new Pool({
+  connectionString: process.env.NODE_ENV === 'production' ? NEON_DB_URL : (process.env.DATABASE_URL || NEON_DB_URL),
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
 
 export async function GET() {
   try {
-    const orders = await prisma.order.findMany({
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        orderItems: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                slug: true,
-                name: true,
-                price: true,
-                image: true
-              }
-            }
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
+    const client = await pool.connect();
+
+    const query = `
+      SELECT 
+        o.*,
+        CAST(o."totalAmount" AS FLOAT) / 100 as total_amount_euros,
+        u.id as user_id, u.name as user_name, u.email as user_email,
+        json_agg(
+          json_build_object(
+            'id', oi.id,
+            'productId', oi."productId",
+            'quantity', oi.quantity,
+            'unitPrice', CAST(oi."unitPrice" AS FLOAT) / 100,
+            'product', json_build_object(
+              'id', p.id,
+              'slug', p.slug,
+              'name', p.name,
+              'price', CAST(p.price AS FLOAT) / 100,
+              'image', p.image
+            )
+          )
+        ) as order_items
+      FROM orders o
+      LEFT JOIN users u ON o."userId" = u.id
+      LEFT JOIN order_items oi ON o.id = oi."orderId"
+      LEFT JOIN products p ON oi."productId" = p.id
+      GROUP BY o.id, u.id, u.name, u.email
+      ORDER BY o."createdAt" DESC
+    `;
+
+    const result = await client.query(query);
     
-    return new Response(JSON.stringify(orders), { 
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // Restructurer les données pour correspondre au format attendu
+    const orders = result.rows.map(row => ({
+      id: row.id,
+      userId: row.userId,
+      customerName: row.customerName,
+      customerEmail: row.customerEmail,
+      customerPhone: row.customerPhone,
+      deliveryAddress: row.deliveryAddress,
+      deliveryTime: row.deliveryTime,
+      status: row.status,
+      totalAmount: row.total_amount_euros, // Utiliser la version convertie
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      user: row.user_id ? {
+        id: row.user_id,
+        name: row.user_name,
+        email: row.user_email
+      } : null,
+      orderItems: row.order_items && row.order_items[0].id ? row.order_items : []
+    }));
+
+    client.release();
+    
+    return NextResponse.json(orders);
   } catch (error) {
     console.error('Erreur lors de la récupération des commandes:', error);
-    return new Response(
-      JSON.stringify({ error: 'Erreur lors de la récupération des commandes' }), 
-      { 
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
+    return NextResponse.json(
+      { error: 'Erreur lors de la récupération des commandes' }, 
+      { status: 500 }
     );
   }
 }
 
 export async function POST(request) {
+  const client = await pool.connect();
   try {
     const orderData = await request.json();
     
-    // Créer la commande avec ses items
-    const order = await prisma.order.create({
-      data: {
-        userId: orderData.userId || null,
-        customerName: orderData.customerName || null,
-        customerEmail: orderData.customerEmail || null,
-        customerPhone: orderData.customerPhone || null,
-        deliveryAddress: orderData.deliveryAddress || null,
-        deliveryTime: orderData.deliveryTime || null,
-        status: orderData.status || 'pending',
-        totalAmount: orderData.totalAmount,
-        orderItems: {
-          create: orderData.items?.map(item => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice
-          })) || []
-        }
-      },
-      include: {
-        orderItems: {
-          include: {
-            product: true
-          }
-        }
-      }
-    });
-    
-    return new Response(JSON.stringify(order), { 
-      status: 201,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    console.log('📋 Données commande reçues:', orderData);
+
+    // Commencer une transaction
+    await client.query('BEGIN');
+
+    // Créer la commande
+    const orderQuery = `
+      INSERT INTO orders (
+        "userId", "customerName", "customerEmail", "customerPhone", 
+        "deliveryAddress", "deliveryTime", status, "totalAmount", "createdAt", "updatedAt"
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+      RETURNING *
+    `;
+
+    const orderValues = [
+      orderData.userId || null,
+      orderData.customerName || null,
+      orderData.customerEmail || null,
+      orderData.customerPhone || null,
+      orderData.deliveryAddress || null,
+      orderData.deliveryTime || null,
+      orderData.status || 'pending',
+      Math.round(parseFloat(orderData.totalAmount) * 100) // Convertir en centimes pour integer
+    ];
+
+    const orderResult = await client.query(orderQuery, orderValues);
+    const order = orderResult.rows[0];
+
+    console.log('✅ Commande créée:', order.id);
+
+    // Créer les items de la commande
+    if (orderData.items && orderData.items.length > 0) {
+      const itemsQuery = `
+        INSERT INTO order_items ("orderId", "productId", quantity, "unitPrice", "createdAt")
+        VALUES ${orderData.items.map((_, index) => 
+          `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${index * 5 + 4}, NOW())`
+        ).join(', ')}
+        RETURNING *
+      `;
+
+      const itemsValues = orderData.items.flatMap(item => [
+        order.id,
+        item.productId,
+        item.quantity,
+        Math.round(parseFloat(item.unitPrice) * 100) // Convertir en centimes
+      ]);
+
+      const itemsResult = await client.query(itemsQuery, itemsValues);
+      
+      console.log('✅ Items créés:', itemsResult.rows.length);
+    }
+
+    // Confirmer la transaction
+    await client.query('COMMIT');
+
+    // Récupérer la commande complète avec items et produits
+    const fullOrderQuery = `
+      SELECT 
+        o.*,
+        CAST(o."totalAmount" AS FLOAT) / 100 as total_amount_euros,
+        json_agg(
+          json_build_object(
+            'id', oi.id,
+            'productId', oi."productId",
+            'quantity', oi.quantity,
+            'unitPrice', CAST(oi."unitPrice" AS FLOAT) / 100,
+            'product', json_build_object(
+              'id', p.id,
+              'slug', p.slug,
+              'name', p.name,
+              'price', CAST(p.price AS FLOAT) / 100,
+              'image', p.image
+            )
+          )
+        ) as order_items
+      FROM orders o
+      LEFT JOIN order_items oi ON o.id = oi."orderId"
+      LEFT JOIN products p ON oi."productId" = p.id
+      WHERE o.id = $1
+      GROUP BY o.id
+    `;
+
+    const fullOrderResult = await client.query(fullOrderQuery, [order.id]);
+    const fullOrder = fullOrderResult.rows[0];
+
+    client.release();
+
+    console.log('🎉 Commande complète créée:', fullOrder.id);
+
+    return NextResponse.json({
+      ...fullOrder,
+      totalAmount: fullOrder.total_amount_euros, // Utiliser la version convertie
+      orderItems: fullOrder.order_items && fullOrder.order_items[0].id ? fullOrder.order_items : []
+    }, { status: 201 });
+
   } catch (error) {
-    console.error('Erreur lors de la création de commande:', error);
-    return new Response(
-      JSON.stringify({ error: 'Erreur lors de la création de commande' }), 
+    // Annuler la transaction en cas d'erreur
+    await client.query('ROLLBACK');
+    client.release();
+    
+    console.error('❌ Erreur lors de la création de commande:', error);
+    console.error('Détails:', error.message);
+    console.error('Stack:', error.stack);
+    
+    return NextResponse.json(
       { 
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
+        error: 'Erreur lors de la création de commande',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      }, 
+      { status: 500 }
     );
   }
 }
@@ -97,36 +202,76 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     const { id, ...updateData } = await request.json();
+    const client = await pool.connect();
     
-    const order = await prisma.order.update({
-      where: { id: parseInt(id) },
-      data: {
-        status: updateData.status,
-        deliveryAddress: updateData.deliveryAddress,
-        deliveryTime: updateData.deliveryTime,
-        totalAmount: updateData.totalAmount
-      },
-      include: {
-        orderItems: {
-          include: {
-            product: true
-          }
-        }
-      }
-    });
+    const updateQuery = `
+      UPDATE orders 
+      SET status = $1, "deliveryAddress" = $2, "deliveryTime" = $3, "totalAmount" = $4, "updatedAt" = NOW()
+      WHERE id = $5
+      RETURNING *
+    `;
+
+    const updateValues = [
+      updateData.status,
+      updateData.deliveryAddress,
+      updateData.deliveryTime,
+      Math.round(parseFloat(updateData.totalAmount) * 100), // Convertir en centimes
+      parseInt(id)
+    ];
+
+    const result = await client.query(updateQuery, updateValues);
     
-    return new Response(JSON.stringify(order), { 
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
+    if (result.rows.length === 0) {
+      client.release();
+      return NextResponse.json(
+        { error: 'Commande non trouvée' }, 
+        { status: 404 }
+      );
+    }
+
+    // Récupérer la commande complète avec items et produits
+    const fullOrderQuery = `
+      SELECT 
+        o.*,
+        CAST(o."totalAmount" AS FLOAT) / 100 as total_amount_euros,
+        json_agg(
+          json_build_object(
+            'id', oi.id,
+            'productId', oi."productId",
+            'quantity', oi.quantity,
+            'unitPrice', CAST(oi."unitPrice" AS FLOAT) / 100,
+            'product', json_build_object(
+              'id', p.id,
+              'slug', p.slug,
+              'name', p.name,
+              'price', CAST(p.price AS FLOAT) / 100,
+              'image', p.image
+            )
+          )
+        ) as order_items
+      FROM orders o
+      LEFT JOIN order_items oi ON o.id = oi."orderId"
+      LEFT JOIN products p ON oi."productId" = p.id
+      WHERE o.id = $1
+      GROUP BY o.id
+    `;
+
+    const fullOrderResult = await client.query(fullOrderQuery, [parseInt(id)]);
+    const fullOrder = fullOrderResult.rows[0];
+
+    client.release();
+    
+    return NextResponse.json({
+      ...fullOrder,
+      totalAmount: fullOrder.total_amount_euros, // Utiliser la version convertie
+      orderItems: fullOrder.order_items && fullOrder.order_items[0].id ? fullOrder.order_items : []
     });
+
   } catch (error) {
     console.error('Erreur lors de la mise à jour de commande:', error);
-    return new Response(
-      JSON.stringify({ error: 'Erreur lors de la mise à jour de commande' }), 
-      { 
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
+    return NextResponse.json(
+      { error: 'Erreur lors de la mise à jour de commande' }, 
+      { status: 500 }
     );
   }
 }
