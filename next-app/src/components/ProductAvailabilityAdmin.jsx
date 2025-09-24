@@ -76,16 +76,16 @@ export default function ProductAvailabilityAdmin() {
         {products.map(product => (
           <div
             key={product.id}
-            className={`bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 border-2 ${product.available ? 'border-green-400' : 'border-red-300 opacity-60 grayscale'}`}
+            className={`bg-white rounded-xl shadow-lg p-4 flex flex-col items-center transition-all duration-300 border-2 ${product.available ? 'border-green-400' : 'border-red-300'}`}
           >
-            <div className="w-20 h-20 mb-2 flex items-center justify-center overflow-hidden rounded-lg bg-gray-100">
+            <div className={`w-20 h-20 mb-2 flex items-center justify-center overflow-hidden rounded-lg bg-gray-100 ${!product.available ? 'opacity-60 grayscale' : ''}`}>
               {product.image ? (
                 <img src={product.image} alt={product.name} className="object-cover w-full h-full" />
               ) : (
                 <span className="text-gray-400 text-xs">Aucune image</span>
               )}
             </div>
-            <div className="font-semibold text-base mb-1 text-center line-clamp-2">{product.name}</div>
+            <div className="font-semibold text-base mb-1 text-center line-clamp-2 text-gray-900">{product.name}</div>
             <div className="text-green-700 font-bold text-sm mb-2">{product.price?.toLocaleString('fr-FR')} F</div>
             <label className={`flex items-center gap-2 mt-2 ${updatingProducts.has(product.id) ? 'cursor-wait opacity-60' : 'cursor-pointer'}`}>
               <input
