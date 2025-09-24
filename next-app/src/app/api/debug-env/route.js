@@ -14,7 +14,12 @@ export async function GET() {
     let urlAnalysis = {
       used: 'NONE',
       hostname: 'N/A',
-      valid: false
+      valid: false,
+      actualUrls: {
+        DATABASE_URL: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/\/\/.*@/, '//***@') : null,
+        NEON_PRISMA_URL: process.env.NEON_PRISMA_URL ? process.env.NEON_PRISMA_URL.replace(/\/\/.*@/, '//***@') : null,
+        POSTGRES_URL: process.env.POSTGRES_URL ? process.env.POSTGRES_URL.replace(/\/\/.*@/, '//***@') : null,
+      }
     };
 
     if (connectionString) {

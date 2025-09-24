@@ -1,20 +1,8 @@
 import { Pool } from 'pg';
 
 // Client PostgreSQL direct pour Neon (plus fiable que Prisma)
-const getConnectionString = () => {
-  // Fix temporaire : utiliser la bonne URL Neon si les variables pointent vers "base"
-  const envUrl = process.env.DATABASE_URL || process.env.NEON_PRISMA_URL || process.env.POSTGRES_URL;
-  
-  if (envUrl && envUrl.includes('base')) {
-    console.log('⚠️ URL invalide détectée, utilisation de l\'URL Neon correcte');
-    return 'postgres://default:UpPh5bCk6iSZ@ep-snowy-union-a4t26bx0-pooler.us-east-1.aws.neon.tech/verceldb?sslmode=require';
-  }
-  
-  return envUrl || 'postgres://default:UpPh5bCk6iSZ@ep-snowy-union-a4t26bx0-pooler.us-east-1.aws.neon.tech/verceldb?sslmode=require';
-};
-
 const pool = new Pool({
-  connectionString: getConnectionString(),
+  connectionString: process.env.DATABASE_URL || process.env.NEON_PRISMA_URL || process.env.POSTGRES_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 20,
   idleTimeoutMillis: 30000,
