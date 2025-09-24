@@ -133,7 +133,7 @@ export default function OrderList() {
         <button
           onClick={() => setFilter('paid')}
           className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-            filter === 'paid' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            filter === 'paid' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300 border border-gray-400'
           }`}
         >
           🟢 À préparer ({orders.filter(o => o.status === 'paid' || o.status === 'confirmed').length})
@@ -142,7 +142,7 @@ export default function OrderList() {
         <button
           onClick={() => setFilter('preparing')}
           className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-            filter === 'preparing' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            filter === 'preparing' ? 'bg-yellow-600 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300 border border-gray-400'
           }`}
         >
           🟡 En préparation ({orders.filter(o => o.status === 'preparing').length})
@@ -151,7 +151,7 @@ export default function OrderList() {
         <button
           onClick={() => setFilter('ready')}
           className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-            filter === 'ready' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            filter === 'ready' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300 border border-gray-400'
           }`}
         >
           🔵 Prêtes ({orders.filter(o => o.status === 'ready').length})
@@ -160,7 +160,7 @@ export default function OrderList() {
         <button
           onClick={() => setFilter('all')}
           className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-            filter === 'all' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            filter === 'all' ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-900 hover:bg-gray-300 border border-gray-400'
           }`}
         >
           📋 Toutes ({orders.length})
@@ -169,9 +169,9 @@ export default function OrderList() {
 
       {/* Liste des commandes */}
       {filteredOrders.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-gray-800">
           <p className="text-lg">🍽️ Aucune commande dans cette catégorie</p>
-          <p className="text-sm mt-2">Les nouvelles commandes apparaîtront ici automatiquement</p>
+          <p className="text-sm mt-2 text-gray-700">Les nouvelles commandes apparaîtront ici automatiquement</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -183,7 +183,7 @@ export default function OrderList() {
                   <h3 className="text-xl font-bold text-green-800">
                     📋 Commande #{order.id}
                   </h3>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-sm text-gray-800 mt-1">
                     <p>👤 {order.user?.name || order.customerName}</p>
                     <p>📧 {order.user?.email || order.customerEmail}</p>
                     <p>📞 {order.customerPhone}</p>
@@ -194,7 +194,7 @@ export default function OrderList() {
                   <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}>
                     {getStatusText(order.status)}
                   </span>
-                  <div className="text-sm text-gray-600 mt-2">
+                  <div className="text-sm text-gray-800 mt-2">
                     <p>🕐 {new Date(order.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</p>
                     <p>📅 {new Date(order.createdAt).toLocaleDateString('fr-FR')}</p>
                   </div>
@@ -208,8 +208,8 @@ export default function OrderList() {
                   {order.orderItems && order.orderItems.map((item, index) => (
                     <div key={index} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
                       <div className="flex-1">
-                        <span className="font-medium">{item.product?.name || `Produit ${item.productId}`}</span>
-                        <span className="text-sm text-gray-600 ml-2">(#{item.productId})</span>
+                        <span className="font-medium text-gray-900">{item.product?.name || `Produit ${item.productId}`}</span>
+                        <span className="text-sm text-gray-700 ml-2">(#{item.productId})</span>
                       </div>
                       <div className="text-center min-w-[80px]">
                         <span className="bg-green-100 text-green-800 px-2 py-1 rounded font-bold">
@@ -217,8 +217,8 @@ export default function OrderList() {
                         </span>
                       </div>
                       <div className="text-right min-w-[100px]">
-                        <span className="font-medium">{item.price} FCFA</span>
-                        <div className="text-sm text-gray-600">
+                        <span className="font-medium text-gray-900">{item.price} FCFA</span>
+                        <div className="text-sm text-gray-800">
                           = {item.price * item.quantity} FCFA
                         </div>
                       </div>
@@ -286,28 +286,28 @@ export default function OrderList() {
           <div className="text-2xl font-bold text-green-700">
             {orders.filter(o => o.status === 'paid' || o.status === 'confirmed').length}
           </div>
-          <div className="text-sm text-green-600">À préparer</div>
+          <div className="text-sm text-green-800 font-medium">À préparer</div>
         </div>
         
         <div className="bg-yellow-100 p-4 rounded-lg text-center">
           <div className="text-2xl font-bold text-yellow-700">
             {orders.filter(o => o.status === 'preparing').length}
           </div>
-          <div className="text-sm text-yellow-600">En cours</div>
+          <div className="text-sm text-yellow-800 font-medium">En cours</div>
         </div>
         
         <div className="bg-blue-100 p-4 rounded-lg text-center">
           <div className="text-2xl font-bold text-blue-700">
             {orders.filter(o => o.status === 'ready').length}
           </div>
-          <div className="text-sm text-blue-600">Prêtes</div>
+          <div className="text-sm text-blue-800 font-medium">Prêtes</div>
         </div>
         
         <div className="bg-gray-100 p-4 rounded-lg text-center">
           <div className="text-2xl font-bold text-gray-700">
             {orders.filter(o => o.status === 'delivered').length}
           </div>
-          <div className="text-sm text-gray-600">Livrées</div>
+          <div className="text-sm text-gray-800 font-medium">Livrées</div>
         </div>
       </div>
     </div>
