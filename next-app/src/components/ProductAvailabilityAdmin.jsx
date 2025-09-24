@@ -86,9 +86,9 @@ export default function ProductAvailabilityAdmin() {
               )}
             </div>
             <div 
-              className="font-semibold text-base mb-1 text-center text-black font-bold" 
+              className="font-semibold text-base mb-1 text-center text-green-800 font-bold" 
               style={{
-                color: '#000000 !important', 
+                color: '#166534 !important', 
                 opacity: '1 !important', 
                 fontWeight: 'bold',
                 textShadow: '1px 1px 1px rgba(255,255,255,0.5)'
