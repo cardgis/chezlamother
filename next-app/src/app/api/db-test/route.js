@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 
 // Configuration de test de connexion
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL || process.env.NEON_PRISMA_URL || process.env.POSTGRES_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 5,
   idleTimeoutMillis: 30000,
@@ -14,7 +14,11 @@ export async function GET() {
     console.log('🧪 Test de connexion à la base de données');
     console.log('🔐 NODE_ENV:', process.env.NODE_ENV);
     console.log('📋 DATABASE_URL existe:', !!process.env.DATABASE_URL);
-    console.log('🔗 DATABASE_URL (masqué):', process.env.DATABASE_URL?.replace(/\/\/.*@/, '//***@'));
+    console.log('� NEON_PRISMA_URL existe:', !!process.env.NEON_PRISMA_URL);
+    console.log('📋 POSTGRES_URL existe:', !!process.env.POSTGRES_URL);
+    
+    const dbUrl = process.env.DATABASE_URL || process.env.NEON_PRISMA_URL || process.env.POSTGRES_URL;
+    console.log('🔗 URL utilisée (masquée):', dbUrl?.replace(/\/\/.*@/, '//***@'));
     
     const client = await pool.connect();
     console.log('✅ Connexion réussie');
