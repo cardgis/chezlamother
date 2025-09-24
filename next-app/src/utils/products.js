@@ -19,6 +19,11 @@ export const productSections = [
     key: "a_la_carte"
   },
   {
+    title: "Accompagnements",
+    subtitle: "Complétez vos plats favoris",
+    key: "accompagnements"
+  },
+  {
     title: "Pizzas Artisanales",
     subtitle: "Pâtes fraîches et garnitures généreuses",
     key: "pizzas"
@@ -27,11 +32,6 @@ export const productSections = [
     title: "Boissons Traditionnelles",
     subtitle: "Jus naturels et boissons chaudes",
     key: "boissons"
-  },
-  {
-    title: "Accompagnements",
-    subtitle: "Complétez vos plats favoris",
-    key: "accompagnements"
   },
   {
     title: "Desserts Gourmands",
