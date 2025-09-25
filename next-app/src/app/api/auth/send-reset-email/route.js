@@ -43,6 +43,12 @@ export async function POST(req) {
     const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
 
     // Envoyer l'email avec SendGrid
+    console.log('Configuration SendGrid:', {
+      apiKeyExists: !!process.env.SENDGRID_API_KEY,
+      apiKeyStart: process.env.SENDGRID_API_KEY?.substring(0, 8),
+      email: email
+    });
+
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
       to: email,
@@ -68,17 +74,53 @@ export async function POST(req) {
       `
     };
     
+    console.log('Tentative d\'envoi email vers:', email);
     await sgMail.send(msg);
+    console.log('Email envoyé avec succès!');
     return new Response(JSON.stringify({ 
       success: true, 
       message: 'Email de réinitialisation envoyé avec succès' 
     }), { status: 200 });
     
   } catch (error) {
-    console.error('Reset password error:', error);
+    console.error('=== ERREUR RESET PASSWORD ===');
+    console.error('Type d\'erreur:', error.constructor.name);
+    console.error('Message:', error.message);
+    console.error('Code:', error.code);
+    console.error('Status:', error.status);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+      console.error('Response body:', JSON.stringify(error.response.body, null, 2));
+    }
+    console.error('Stack:', error.stack);
+    console.error('==============================');
+    
+    // Gestion d'erreurs spécifiques
+    if (error.code === 'ENOTFOUND') {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Erreur de réseau DNS. Vérifiez la connexion internet.' 
+      }), { status: 500 });
+    }
+    
+    if (error.response && error.response.status === 401) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Clé API SendGrid invalide. Vérifiez votre configuration.' 
+      }), { status: 500 });
+    }
+    
+    if (error.response && error.response.status === 403) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Adresse email non autorisée par SendGrid.' 
+      }), { status: 500 });
+    }
+    
     return new Response(JSON.stringify({ 
       success: false, 
-      error: 'Erreur lors de l\'envoi de l\'email. Vérifiez votre adresse email.' 
+      error: `Erreur lors de l'envoi de l'email: ${error.message}` 
     }), { status: 500 });
   }
 }
