@@ -1,67 +1,74 @@
-import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import bcrypt from 'bcryptjs';
+import { Pool } from 'pg';
 
-const prisma = new PrismaClient();
+// Configuration de la connexion PostgreSQL directe
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
 
 export async function POST(req) {
-  const { token, password } = await req.json();
+  const { token, password, newPassword } = await req.json();
   
-  // Password strength validation
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
-  if (!passwordRegex.test(password)) {
-    return NextResponse.json({ error: "Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial." }, { status: 400 });
+  // Accepter soit 'password' soit 'newPassword' pour compatibilité
+  const passwordToUse = newPassword || password;
+  
+  if (!token || !passwordToUse) {
+    return new Response(JSON.stringify({ error: 'Token et nouveau mot de passe requis' }), { status: 400 });
   }
-  
-  if (!token || !password) {
-    return NextResponse.json({ error: "Token et mot de passe requis." }, { status: 400 });
+
+  if (passwordToUse.length < 6) {
+    return new Response(JSON.stringify({ error: 'Le mot de passe doit contenir au moins 6 caractères' }), { status: 400 });
   }
 
   try {
-    // Chercher le token valide dans Prisma
-    const resetToken = await prisma.resetToken.findFirst({
-      where: {
-        code: token,
-        used: false,
-        expiresAt: {
-          gt: new Date() // Token non expiré
-        }
-      }
-    });
+    // Vérifier le token de réinitialisation
+    const tokenQuery = `
+      SELECT email, expires_at, used 
+      FROM reset_tokens 
+      WHERE code = $1 AND used = false AND expires_at > NOW()
+    `;
+    const tokenResult = await pool.query(tokenQuery, [token]);
 
-    if (!resetToken) {
-      return NextResponse.json({ error: "Token invalide ou expiré." }, { status: 400 });
+    if (tokenResult.rows.length === 0) {
+      return new Response(JSON.stringify({ error: 'Token invalide ou expiré' }), { status: 400 });
     }
 
-    // Chercher l'utilisateur
-    const user = await prisma.user.findUnique({
-      where: { email: resetToken.email }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "Utilisateur non trouvé." }, { status: 400 });
-    }
+    const { email } = tokenResult.rows[0];
 
     // Hasher le nouveau mot de passe
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(passwordToUse, 12);
 
-    // Mettre à jour le mot de passe
-    await prisma.user.update({
-      where: { email: resetToken.email },
-      data: { password: hashedPassword }
-    });
+    // Mettre à jour le mot de passe de l'utilisateur
+    const updateUserQuery = `
+      UPDATE users 
+      SET password = $1, updated_at = NOW() 
+      WHERE email = $2
+    `;
+    await pool.query(updateUserQuery, [hashedPassword, email]);
 
     // Marquer le token comme utilisé
-    await prisma.resetToken.update({
-      where: { id: resetToken.id },
-      data: { used: true }
-    });
+    const updateTokenQuery = `
+      UPDATE reset_tokens 
+      SET used = true, updated_at = NOW() 
+      WHERE code = $1
+    `;
+    await pool.query(updateTokenQuery, [token]);
 
-    return NextResponse.json({ success: true });
+    // Supprimer tous les autres tokens de cet utilisateur
+    const deleteOtherTokensQuery = 'DELETE FROM reset_tokens WHERE email = $1 AND code != $2';
+    await pool.query(deleteOtherTokensQuery, [email, token]);
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Mot de passe réinitialisé avec succès' 
+    }), { status: 200 });
+
   } catch (error) {
-    console.error("Reset password error:", error);
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
+    console.error('Reset password error:', error);
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: 'Erreur lors de la réinitialisation du mot de passe' 
+    }), { status: 500 });
   }
 }
