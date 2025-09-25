@@ -47,10 +47,24 @@ export async function POST(req) {
       to: email,
       from: 'alexandrenasalan1@outlook.fr',
       replyTo: 'alexandrenasalan1@outlook.fr',
-      templateId: 'd-4a2f20d2dfac4ed4b3c0f2d85bf5d2cf',
-      dynamic_template_data: {
-        resetUrl: resetUrl
-      }
+      subject: 'Réinitialisation de votre mot de passe - Chez La Mother',
+      text: `Bonjour,\n\nVous avez demandé la réinitialisation de votre mot de passe.\n\nCliquez sur ce lien pour réinitialiser votre mot de passe :\n${resetUrl}\n\nCe lien expire dans 1 heure.\n\nSi vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n\nÉquipe Chez La Mother`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #d97706;">Réinitialisation de votre mot de passe</h2>
+          <p>Bonjour,</p>
+          <p>Vous avez demandé la réinitialisation de votre mot de passe pour votre compte Chez La Mother.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" style="background-color: #d97706; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+              Réinitialiser mon mot de passe
+            </a>
+          </div>
+          <p><strong>Ce lien expire dans 1 heure.</strong></p>
+          <p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
+          <hr style="margin: 20px 0;">
+          <p style="color: #666; font-size: 12px;">Équipe Chez La Mother</p>
+        </div>
+      `
     };
     
     await sgMail.send(msg);
