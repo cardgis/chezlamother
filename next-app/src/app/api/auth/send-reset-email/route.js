@@ -42,31 +42,15 @@ export async function POST(req) {
     const baseUrl = 'https://chezlamother.vercel.app';
     const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
 
-    // Envoyer l'email avec SendGrid
+    // Envoyer l'email avec SendGrid (avec retry automatique)
     console.log('Configuration SendGrid:', {
       apiKeyExists: !!process.env.SENDGRID_API_KEY,
       apiKeyStart: process.env.SENDGRID_API_KEY?.substring(0, 8),
       email: email
     });
 
-    // Configuration explicite de SendGrid avec timeout et retry
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     
-    // Configurer le client HTTP avec des options spécifiques à Vercel
-    const https = require('https');
-    const agent = new https.Agent({
-      keepAlive: true,
-      timeout: 30000,
-      family: 4 // Forcer IPv4
-    });
-    
-    sgMail.setClient({
-      request: {
-        agent: agent,
-        timeout: 30000
-      }
-    });
-
     const msg = {
       to: email,
       from: 'alexandrenasalan1@outlook.fr',
@@ -91,53 +75,66 @@ export async function POST(req) {
       `
     };
     
-    console.log('Tentative d\'envoi email vers:', email);
-    await sgMail.send(msg);
-    console.log('Email envoyé avec succès!');
+    // Retry automatique en cas d'échec réseau
+    let emailSent = false;
+    let lastError = null;
+    
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`Tentative ${attempt}/3 d'envoi email vers:`, email);
+        await sgMail.send(msg);
+        console.log('Email envoyé avec succès!');
+        emailSent = true;
+        break;
+      } catch (retryError) {
+        console.log(`Échec tentative ${attempt}:`, retryError.message);
+        lastError = retryError;
+        if (attempt < 3) {
+          // Attendre 2 secondes avant la prochaine tentative
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
+    }
+    
+    if (!emailSent) {
+      throw lastError;
+    }
     return new Response(JSON.stringify({ 
       success: true, 
       message: 'Email de réinitialisation envoyé avec succès' 
     }), { status: 200 });
     
   } catch (error) {
-    console.error('=== ERREUR RESET PASSWORD ===');
-    console.error('Type d\'erreur:', error.constructor.name);
+    console.error('=== ERREUR RESET PASSWORD (SENDGRID) ===');
     console.error('Message:', error.message);
     console.error('Code:', error.code);
-    console.error('Status:', error.status);
-    if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response headers:', error.response.headers);
-      console.error('Response body:', JSON.stringify(error.response.body, null, 2));
-    }
-    console.error('Stack:', error.stack);
     console.error('==============================');
     
-    // Gestion d'erreurs spécifiques
+    // Gestion d'erreurs spécifiques SendGrid
     if (error.code === 'ENOTFOUND') {
       return new Response(JSON.stringify({ 
         success: false, 
-        error: 'Erreur de réseau DNS. Vérifiez la connexion internet.' 
+        error: 'Problème temporaire de réseau. Réessayez dans quelques minutes.' 
       }), { status: 500 });
     }
     
     if (error.response && error.response.status === 401) {
       return new Response(JSON.stringify({ 
         success: false, 
-        error: 'Clé API SendGrid invalide. Vérifiez votre configuration.' 
+        error: 'Configuration email incorrecte. Contactez l\'administrateur.' 
       }), { status: 500 });
     }
     
     if (error.response && error.response.status === 403) {
       return new Response(JSON.stringify({ 
         success: false, 
-        error: 'Adresse email non autorisée par SendGrid.' 
+        error: 'Email non autorisé. Vérifiez votre adresse.' 
       }), { status: 500 });
     }
     
     return new Response(JSON.stringify({ 
       success: false, 
-      error: `Erreur lors de l'envoi de l'email: ${error.message}` 
+      error: 'Erreur temporaire. Réessayez dans quelques minutes.' 
     }), { status: 500 });
   }
 }
