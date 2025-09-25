@@ -1,12 +1,8 @@
-import sgMail from '@sendgrid/mail';
+import { pool } from '../../../lib/prisma';
 import { v4 as uuidv4 } from 'uuid';
-import { Pool } from 'pg';
+import { Resend } from 'resend';
 
-// Configuration de la connexion PostgreSQL directe
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req) {
   const { email } = await req.json();
@@ -42,37 +38,13 @@ export async function POST(req) {
     const baseUrl = 'https://chezlamother.vercel.app';
     const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
 
-    // Envoyer l'email avec SendGrid
-    console.log('Configuration SendGrid:', {
-      apiKeyExists: !!process.env.SENDGRID_API_KEY,
-      apiKeyStart: process.env.SENDGRID_API_KEY?.substring(0, 8),
-      email: email
-    });
-
-    // Configuration explicite de SendGrid avec timeout et retry
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    // Envoyer l'email avec Resend (alternative à SendGrid)
+    console.log('Envoi email avec Resend vers:', email);
     
-    // Configurer le client HTTP avec des options spécifiques à Vercel
-    const https = require('https');
-    const agent = new https.Agent({
-      keepAlive: true,
-      timeout: 30000,
-      family: 4 // Forcer IPv4
-    });
-    
-    sgMail.setClient({
-      request: {
-        agent: agent,
-        timeout: 30000
-      }
-    });
-
-    const msg = {
-      to: email,
-      from: 'alexandrenasalan1@outlook.fr',
-      replyTo: 'alexandrenasalan1@outlook.fr',
+    const { data, error } = await resend.emails.send({
+      from: 'Chez La Mother <onboarding@resend.dev>', // Adresse par défaut Resend
+      to: [email],
       subject: 'Réinitialisation de votre mot de passe - Chez La Mother',
-      text: `Bonjour,\n\nVous avez demandé la réinitialisation de votre mot de passe.\n\nCliquez sur ce lien pour réinitialiser votre mot de passe :\n${resetUrl}\n\nCe lien expire dans 1 heure.\n\nSi vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n\nÉquipe Chez La Mother`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #d97706;">Réinitialisation de votre mot de passe</h2>
@@ -89,51 +61,24 @@ export async function POST(req) {
           <p style="color: #666; font-size: 12px;">Équipe Chez La Mother</p>
         </div>
       `
-    };
+    });
+
+    if (error) {
+      console.error('Erreur Resend:', error);
+      throw new Error(`Erreur Resend: ${error.message}`);
+    }
+
+    console.log('Email envoyé avec succès via Resend:', data);
     
-    console.log('Tentative d\'envoi email vers:', email);
-    await sgMail.send(msg);
-    console.log('Email envoyé avec succès!');
     return new Response(JSON.stringify({ 
       success: true, 
       message: 'Email de réinitialisation envoyé avec succès' 
     }), { status: 200 });
     
   } catch (error) {
-    console.error('=== ERREUR RESET PASSWORD ===');
-    console.error('Type d\'erreur:', error.constructor.name);
+    console.error('=== ERREUR RESET PASSWORD (RESEND) ===');
     console.error('Message:', error.message);
-    console.error('Code:', error.code);
-    console.error('Status:', error.status);
-    if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response headers:', error.response.headers);
-      console.error('Response body:', JSON.stringify(error.response.body, null, 2));
-    }
-    console.error('Stack:', error.stack);
     console.error('==============================');
-    
-    // Gestion d'erreurs spécifiques
-    if (error.code === 'ENOTFOUND') {
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Erreur de réseau DNS. Vérifiez la connexion internet.' 
-      }), { status: 500 });
-    }
-    
-    if (error.response && error.response.status === 401) {
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Clé API SendGrid invalide. Vérifiez votre configuration.' 
-      }), { status: 500 });
-    }
-    
-    if (error.response && error.response.status === 403) {
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Adresse email non autorisée par SendGrid.' 
-      }), { status: 500 });
-    }
     
     return new Response(JSON.stringify({ 
       success: false, 
