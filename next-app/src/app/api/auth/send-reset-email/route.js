@@ -38,15 +38,11 @@ export async function POST(req) {
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
     await pool.query(insertTokenQuery, [email, token, expiresAt]);
 
-    // Pour le moment, on simule l'envoi d'email
+    // Lien de réinitialisation
     const baseUrl = 'https://chezlamother.vercel.app';
     const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
-    
-    console.log('Token généré pour', email, ':', token);
-    console.log('Lien de réinitialisation:', resetUrl);
-    
-    // TODO: Réactiver l'envoi d'email une fois le problème SendGrid résolu
-    /*
+
+    // Envoyer l'email avec SendGrid
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
       to: email,
@@ -54,7 +50,7 @@ export async function POST(req) {
       replyTo: 'alexandrenasalan1@outlook.fr',
       subject: 'Réinitialisation de votre mot de passe - Chez La Mother',
       text: `Bonjour,\n\nVous avez demandé la réinitialisation de votre mot de passe.\n\nCliquez sur ce lien pour réinitialiser votre mot de passe :\n${resetUrl}\n\nCe lien expire dans 1 heure.\n\nSi vous n'avez pas demandé cette réinitialisation, ignorez cet email.\n\nÉquipe Chez La Mother`,
-      html: \`
+      html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #d97706;">Réinitialisation de votre mot de passe</h2>
           <p>Bonjour,</p>
@@ -69,37 +65,20 @@ export async function POST(req) {
           <hr style="margin: 20px 0;">
           <p style="color: #666; font-size: 12px;">Équipe Chez La Mother</p>
         </div>
-      \`
+      `
     };
     
     await sgMail.send(msg);
-    */
-    
     return new Response(JSON.stringify({ 
       success: true, 
-      message: 'Token de réinitialisation généré. (Email temporairement désactivé)', 
-      resetUrl: resetUrl  // Pour test temporaire
+      message: 'Email de réinitialisation envoyé avec succès' 
     }), { status: 200 });
     
   } catch (error) {
-    console.error('Reset password error détaillée:', {
-      message: error.message,
-      code: error.code,
-      response: error.response?.body || 'Pas de response body',
-      stack: error.stack
-    });
-    
-    // Erreur spécifique pour les problèmes réseau/DNS
-    if (error.code === 'ENOTFOUND') {
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Erreur de configuration réseau. Contactez l\'administrateur.' 
-      }), { status: 500 });
-    }
-    
+    console.error('Reset password error:', error);
     return new Response(JSON.stringify({ 
       success: false, 
-      error: 'Erreur lors de l\'envoi de l\'email. Réessayez plus tard.' 
+      error: 'Erreur lors de l\'envoi de l\'email. Vérifiez votre adresse email.' 
     }), { status: 500 });
   }
 }
