@@ -39,7 +39,10 @@ export async function POST(req) {
     await pool.query(insertTokenQuery, [email, token, expiresAt]);
 
     // Lien de réinitialisation
-    const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset-password?token=${token}`;
+    const baseUrl = 'https://chezlamother.vercel.app'; // URL hardcodée pour éviter les problèmes de variables
+    const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
+    
+    console.log('Reset URL généré:', resetUrl); // Pour debug
 
     // Envoyer l'email avec SendGrid
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -68,9 +71,27 @@ export async function POST(req) {
     };
     
     await sgMail.send(msg);
+    console.log('Email envoyé avec succès vers:', email);
     return new Response(JSON.stringify({ success: true, message: 'Email de réinitialisation envoyé' }), { status: 200 });
   } catch (error) {
-    console.error('Reset password error:', error);
-    return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500 });
+    console.error('Reset password error détaillée:', {
+      message: error.message,
+      code: error.code,
+      response: error.response?.body || 'Pas de response body',
+      stack: error.stack
+    });
+    
+    // Erreur spécifique pour les problèmes réseau/DNS
+    if (error.code === 'ENOTFOUND') {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Erreur de configuration réseau. Contactez l\'administrateur.' 
+      }), { status: 500 });
+    }
+    
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: 'Erreur lors de l\'envoi de l\'email. Réessayez plus tard.' 
+    }), { status: 500 });
   }
 }
