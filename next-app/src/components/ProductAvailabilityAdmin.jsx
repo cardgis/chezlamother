@@ -85,7 +85,17 @@ export default function ProductAvailabilityAdmin() {
                 <span className="text-gray-400 text-xs">Aucune image</span>
               )}
             </div>
-            <div className="font-semibold text-base mb-1 text-center text-black font-bold" style={{color: '#000000', opacity: 1}}>{product.name}</div>
+            <div 
+              className="font-semibold text-base mb-1 text-center text-green-800 font-bold" 
+              style={{
+                color: '#166534 !important', 
+                opacity: '1 !important', 
+                fontWeight: 'bold',
+                textShadow: '1px 1px 1px rgba(255,255,255,0.5)'
+              }}
+            >
+              {product.name}
+            </div>
             <div className="text-green-700 font-bold text-sm mb-2">{product.price?.toLocaleString('fr-FR')} F</div>
             <label className={`flex items-center gap-2 mt-2 ${updatingProducts.has(product.id) ? 'cursor-wait opacity-60' : 'cursor-pointer'}`}>
               <input
