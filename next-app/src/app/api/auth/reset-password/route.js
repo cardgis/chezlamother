@@ -32,9 +32,9 @@ export async function POST(req) {
   try {
     // Vérifier le token de réinitialisation
     const tokenQuery = `
-      SELECT email, expires_at, used 
+      SELECT email, "expiresAt", used 
       FROM reset_tokens 
-      WHERE code = $1 AND used = false AND expires_at > NOW()
+      WHERE code = $1 AND used = false AND "expiresAt" > NOW()
     `;
     const tokenResult = await pool.query(tokenQuery, [token]);
 
@@ -50,7 +50,7 @@ export async function POST(req) {
     // Mettre à jour le mot de passe de l'utilisateur
     const updateUserQuery = `
       UPDATE users 
-      SET password = $1, updated_at = NOW() 
+      SET password = $1, "updatedAt" = NOW() 
       WHERE email = $2
     `;
     await pool.query(updateUserQuery, [hashedPassword, email]);
@@ -58,7 +58,7 @@ export async function POST(req) {
     // Marquer le token comme utilisé
     const updateTokenQuery = `
       UPDATE reset_tokens 
-      SET used = true, updated_at = NOW() 
+      SET used = true, "updatedAt" = NOW() 
       WHERE code = $1
     `;
     await pool.query(updateTokenQuery, [token]);

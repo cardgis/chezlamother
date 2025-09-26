@@ -51,7 +51,7 @@ export async function POST(req) {
     // Créer le nouveau token
     console.log('💾 Création nouveau token...');
     const insertTokenQuery = `
-      INSERT INTO reset_tokens (email, code, expires_at, created_at, updated_at) 
+      INSERT INTO reset_tokens (email, code, "expiresAt", "createdAt", "updatedAt") 
       VALUES ($1, $2, $3, NOW(), NOW())
     `;
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
