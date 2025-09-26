@@ -50,7 +50,7 @@ export async function POST(req) {
     // Mettre à jour le mot de passe de l'utilisateur
     const updateUserQuery = `
       UPDATE users 
-      SET password = $1, "updatedAt" = NOW() 
+      SET password = $1 
       WHERE email = $2
     `;
     await pool.query(updateUserQuery, [hashedPassword, email]);
@@ -58,7 +58,7 @@ export async function POST(req) {
     // Marquer le token comme utilisé
     const updateTokenQuery = `
       UPDATE reset_tokens 
-      SET used = true, "updatedAt" = NOW() 
+      SET used = true 
       WHERE code = $1
     `;
     await pool.query(updateTokenQuery, [token]);
