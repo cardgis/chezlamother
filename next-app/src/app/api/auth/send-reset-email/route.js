@@ -105,7 +105,7 @@ export async function POST(req) {
           }
         }],
         from: { 
-          email: "alexandrenasalan1@outlook.fr", 
+          email: "nasalangiscard@gmail.com", 
           name: "Chez La Mother" 
         },
         template_id: templateId
