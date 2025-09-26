@@ -50,13 +50,25 @@ export async function POST(req) {
 
     // Créer le nouveau token
     console.log('💾 Création nouveau token...');
-    const insertTokenQuery = `
-      INSERT INTO reset_tokens (email, code, expires_at) 
-      VALUES ($1, $2, $3)
-    `;
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
-    await client.query(insertTokenQuery, [email, token, expiresAt]);
-    console.log('✅ Token sauvé en DB');
+    try {
+      const insertTokenQuery = `
+        INSERT INTO reset_tokens (email, code, expires_at) 
+        VALUES ($1, $2, $3)
+      `;
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
+      console.log('💾 Paramètres insertion:', { email, token: token.substring(0, 8) + '...', expiresAt });
+      
+      const insertResult = await client.query(insertTokenQuery, [email, token, expiresAt]);
+      console.log('✅ Token sauvé en DB, résultat:', insertResult.rowCount);
+    } catch (insertError) {
+      console.error('❌ ERREUR INSERTION TOKEN:', insertError.message);
+      console.error('❌ Stack:', insertError.stack);
+      client.release();
+      return NextResponse.json({ 
+        success: false, 
+        error: `Erreur insertion token: ${insertError.message}` 
+      }, { status: 500 });
+    }
 
     client.release();
 
