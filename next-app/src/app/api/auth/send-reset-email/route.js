@@ -113,6 +113,7 @@ export async function POST(req) {
     });
 
     console.log('SendGrid Status:', sendGridResponse.status);
+    console.log('SendGrid Headers:', JSON.stringify(Object.fromEntries(sendGridResponse.headers.entries()), null, 2));
 
     if (!sendGridResponse.ok) {
       const errorText = await sendGridResponse.text();
@@ -122,6 +123,9 @@ export async function POST(req) {
         error: `Erreur SendGrid: ${errorText}` 
       }, { status: 500 });
     }
+
+    const responseText = await sendGridResponse.text();
+    console.log('✅ SendGrid Response Body:', responseText || 'Empty response (normal for 202)');
 
     console.log('✅ Email envoyé avec succès!');
     console.log('=== FIN SEND RESET EMAIL ===');
