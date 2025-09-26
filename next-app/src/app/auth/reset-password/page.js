@@ -7,19 +7,19 @@ function ResetPasswordContent() {
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get("token") || "";
-  // const token = params.get("token") || ""; // Supprimé car déjà déclaré plus haut
+  
   React.useEffect(() => {
     if (typeof window !== "undefined" && token) {
       const url = window.location.pathname;
       window.history.replaceState({}, '', url);
     }
   }, [token]);
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  // const token = params.get("token") || ""; // Supprimé car déjà déclaré plus haut
 
   // Envoi du mail de réinitialisation
   const handleSendEmail = async (e) => {
@@ -59,6 +59,7 @@ function ResetPasswordContent() {
     try {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),
       });
       const data = await res.json();
@@ -70,8 +71,8 @@ function ResetPasswordContent() {
       }
     } catch {
       setMessage("Erreur serveur. Réessayez plus tard.");
+    }
     setLoading(false);
-  }
   };
 
   return (

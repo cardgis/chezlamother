@@ -1,5 +1,9 @@
 import bcrypt from 'bcryptjs';
 import { Pool } from 'pg';
+import { NextResponse } from 'next/server';
+
+// FORCER LE RUNTIME NODE.JS
+export const runtime = "nodejs";
 
 // Configuration de la connexion PostgreSQL directe
 const pool = new Pool({
@@ -14,11 +18,15 @@ export async function POST(req) {
   const passwordToUse = newPassword || password;
   
   if (!token || !passwordToUse) {
-    return new Response(JSON.stringify({ error: 'Token et nouveau mot de passe requis' }), { status: 400 });
+    return NextResponse.json({ error: 'Token et nouveau mot de passe requis' }, { status: 400 });
   }
 
-  if (passwordToUse.length < 6) {
-    return new Response(JSON.stringify({ error: 'Le mot de passe doit contenir au moins 6 caractères' }), { status: 400 });
+  // Validation du mot de passe renforcée (même que côté client)
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+  if (!passwordRegex.test(passwordToUse)) {
+    return NextResponse.json({ 
+      error: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial.' 
+    }, { status: 400 });
   }
 
   try {
@@ -31,7 +39,7 @@ export async function POST(req) {
     const tokenResult = await pool.query(tokenQuery, [token]);
 
     if (tokenResult.rows.length === 0) {
-      return new Response(JSON.stringify({ error: 'Token invalide ou expiré' }), { status: 400 });
+      return NextResponse.json({ error: 'Token invalide ou expiré' }, { status: 400 });
     }
 
     const { email } = tokenResult.rows[0];
@@ -59,16 +67,18 @@ export async function POST(req) {
     const deleteOtherTokensQuery = 'DELETE FROM reset_tokens WHERE email = $1 AND code != $2';
     await pool.query(deleteOtherTokensQuery, [email, token]);
 
-    return new Response(JSON.stringify({ 
+    return NextResponse.json({ 
       success: true, 
       message: 'Mot de passe réinitialisé avec succès' 
-    }), { status: 200 });
+    }, { status: 200 });
 
   } catch (error) {
-    console.error('Reset password error:', error);
-    return new Response(JSON.stringify({ 
+    console.error('=== ERREUR RESET PASSWORD ===')
+    console.error('Message:', error.message);
+    console.error('==============================');
+    return NextResponse.json({ 
       success: false, 
       error: 'Erreur lors de la réinitialisation du mot de passe' 
-    }), { status: 500 });
+    }, { status: 500 });
   }
 }
