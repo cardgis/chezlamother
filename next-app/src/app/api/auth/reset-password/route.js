@@ -32,9 +32,9 @@ export async function POST(req) {
   try {
     // Vérifier le token de réinitialisation
     const tokenQuery = `
-      SELECT email, expires_at, used 
+      SELECT email, "expiresAt", used 
       FROM reset_tokens 
-      WHERE code = $1 AND used = false AND expires_at > NOW()
+      WHERE code = $1 AND used = false AND "expiresAt" > NOW()
     `;
     const tokenResult = await pool.query(tokenQuery, [token]);
 
