@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Pool } from 'pg';
 import { NextResponse } from 'next/server';
 
-// FORCER LE RUNTIME NODE.JS
+// FORCER LE RUNTIME NODE.JS (obligatoire pour SendGrid lib)
 export const runtime = "nodejs";
 
 // Configuration de la connexion PostgreSQL directe
@@ -12,68 +12,51 @@ const pool = new Pool({
 });
 
 export async function POST(req) {
-  console.log('=== DÉBUT SEND RESET EMAIL ===');
-  
+  const { email } = await req.json();
+  if (!email) {
+    return new Response(JSON.stringify({ error: 'Email requis' }), { status: 400 });
+  }
+
   try {
-    const { email } = await req.json();
-    console.log('Email reçu:', email);
-    
-    if (!email) {
-      console.log('❌ Email manquant');
-      return NextResponse.json({ error: 'Email requis' }, { status: 400 });
-    }
-
-    console.log('🔌 Test connexion DB...');
-    const client = await pool.connect();
-    console.log('✅ DB connectée');
-
     // Vérifier si l'utilisateur existe
-    console.log('🔍 Recherche utilisateur...');
     const userQuery = 'SELECT id, email FROM users WHERE email = $1';
-    const userResult = await client.query(userQuery, [email]);
-    console.log('Résultat utilisateur:', userResult.rows.length);
+    const userResult = await pool.query(userQuery, [email]);
 
     if (userResult.rows.length === 0) {
-      client.release();
-      console.log('❌ Utilisateur non trouvé');
-      return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
+      return new Response(JSON.stringify({ error: 'Utilisateur non trouvé' }), { status: 404 });
     }
 
     // Générer un token unique
     const token = uuidv4();
-    console.log('🔑 Token généré:', token.substring(0, 8) + '...');
     
-    // Supprimer les anciens tokens
-    console.log('🧹 Suppression anciens tokens...');
+    // Supprimer les anciens tokens pour cet email
     const deleteOldTokensQuery = 'DELETE FROM reset_tokens WHERE email = $1';
-    await client.query(deleteOldTokensQuery, [email]);
+    await pool.query(deleteOldTokensQuery, [email]);
 
-    // Créer le nouveau token
-    console.log('💾 Création nouveau token...');
+    // Créer le nouveau token avec expiration dans 1 heure
     const insertTokenQuery = `
       INSERT INTO reset_tokens (email, code, expires_at, created_at, updated_at) 
       VALUES ($1, $2, $3, NOW(), NOW())
     `;
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
-    await client.query(insertTokenQuery, [email, token, expiresAt]);
-    console.log('✅ Token sauvé en DB');
-
-    client.release();
+    await pool.query(insertTokenQuery, [email, token, expiresAt]);
 
     // Lien de réinitialisation
     const baseUrl = 'https://chezlamother.vercel.app';
     const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
-    console.log('🔗 Reset URL créée');
 
-    // Envoyer l'email avec votre template SendGrid
-    console.log('📧 Envoi email SendGrid...');
-    console.log('API Key existe:', !!process.env.SENDGRID_API_KEY);
-    
+    // Envoyer l'email avec SendGrid API directe (compatible Edge + Node.js)
+    console.log('Configuration SendGrid:', {
+      apiKeyExists: !!process.env.SENDGRID_API_KEY,
+      apiKeyStart: process.env.SENDGRID_API_KEY?.substring(0, 8),
+      email: email
+    });
+
     if (!process.env.SENDGRID_API_KEY) {
-      console.log('❌ SENDGRID_API_KEY manquante');
-      return NextResponse.json({ error: 'Configuration email manquante' }, { status: 500 });
+      throw new Error("SENDGRID_API_KEY manquante");
     }
 
+    // Utilisation de votre template SendGrid personnalisé
     const templateId = "d-4a2f20d2dfac4ed4b3c0f2d85bf5d2cf";
     
     const sendGridResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
@@ -88,7 +71,7 @@ export async function POST(req) {
           dynamic_template_data: {
             resetUrl: resetUrl,
             userEmail: email,
-            userName: email.split('@')[0],
+            userName: email.split('@')[0], // Nom basé sur l'email
             siteName: "Chez La Mother"
           }
         }],
@@ -100,30 +83,44 @@ export async function POST(req) {
       }),
     });
 
-    console.log('SendGrid Status:', sendGridResponse.status);
-
     if (!sendGridResponse.ok) {
       const errorText = await sendGridResponse.text();
-      console.error('❌ SendGrid error:', sendGridResponse.status, errorText);
-      return NextResponse.json({ 
-        success: false, 
-        error: `Erreur SendGrid: ${errorText}` 
-      }, { status: 500 });
+      console.error("SendGrid error:", sendGridResponse.status, errorText);
+      throw new Error(`SendGrid ${sendGridResponse.status}: ${errorText}`);
     }
 
-    console.log('✅ Email envoyé avec succès!');
-    console.log('=== FIN SEND RESET EMAIL ===');
-
+    console.log('Email envoyé avec succès via SendGrid API!');
     return NextResponse.json({ 
       success: true, 
       message: 'Email de réinitialisation envoyé avec succès' 
     }, { status: 200 });
     
   } catch (error) {
-    console.error('=== ERREUR SEND RESET EMAIL ===');
+    console.error('=== ERREUR RESET PASSWORD ===');
     console.error('Message:', error.message);
-    console.error('Stack:', error.stack);
-    console.error('===============================');
+    console.error('==============================');
+    
+    // Gestion d'erreurs spécifiques SendGrid
+    if (error.message.includes('401')) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Configuration email incorrecte. Contactez l\'administrateur.' 
+      }, { status: 500 });
+    }
+    
+    if (error.message.includes('403')) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Email non autorisé. Vérifiez votre adresse.' 
+      }, { status: 500 });
+    }
+    
+    if (error.message.includes('SENDGRID_API_KEY manquante')) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Configuration email manquante.' 
+      }, { status: 500 });
+    }
     
     return NextResponse.json({ 
       success: false, 
