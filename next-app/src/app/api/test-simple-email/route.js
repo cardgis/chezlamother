@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const testEmail = 'alexandrenasalan1@outlook.fr'; // Envoi vers votre propre email
+    const testEmail = 'nasalangiscard@gmail.com'; // Test vers Gmail au lieu d'Outlook
     
     console.log('=== TEST EMAIL SIMPLE SENDGRID ===');
     
@@ -53,7 +53,7 @@ L'équipe Chez La Mother
       success: sendGridResponse.ok,
       status: sendGridResponse.status,
       response: responseText || 'Empty response',
-      message: 'Email simple envoyé - vérifiez votre boîte alexandrenasalan1@outlook.fr (et spams)',
+      message: 'Email simple envoyé - vérifiez votre boîte nasalangiscard@gmail.com (et spams)',
       testType: 'Simple email without template'
     });
     
