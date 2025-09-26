@@ -56,8 +56,8 @@ export async function POST(req) {
       throw new Error("SENDGRID_API_KEY manquante");
     }
 
-    // Utilisation d'un template SendGrid (plus professionnel)
-    const templateId = "d-VOTRE_TEMPLATE_ID"; // À remplacer par votre vrai template ID
+    // Utilisation de votre template SendGrid personnalisé
+    const templateId = "d-4a2f20d2dfac4ed4b3c0f2d85bf5d2cf";
     
     const sendGridResponse = await fetch("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
@@ -71,7 +71,8 @@ export async function POST(req) {
           dynamic_template_data: {
             resetUrl: resetUrl,
             userEmail: email,
-            // Ajoutez d'autres variables selon votre template
+            userName: email.split('@')[0], // Nom basé sur l'email
+            siteName: "Chez La Mother"
           }
         }],
         from: { 
