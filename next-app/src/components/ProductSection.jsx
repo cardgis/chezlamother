@@ -8,7 +8,7 @@ const ProductSection = ({ section, products, onProductClick }) => {
   const getGridClasses = () => {
     // Toutes les sections produits affichent 1 à 4 colonnes selon la taille d'écran
   // Responsive complet : 1 colonne mobile, 2 tablette, 3 desktop, 4 grands écrans, 5 très grands écrans
-  return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mx-auto max-w-7xl justify-items-center";
+  return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center";
   };
 
   return (
