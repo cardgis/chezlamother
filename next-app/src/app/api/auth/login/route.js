@@ -76,10 +76,24 @@ export async function POST(request) {
       message: 'Connexion réussie'
     });
     
-    // Ajouter les cookies d'authentification
-    const [accessCookie, refreshCookie] = createAuthCookies(accessToken, refreshToken);
-    response.headers.set('Set-Cookie', accessCookie);
-    response.headers.append('Set-Cookie', refreshCookie);
+    // Définir les cookies d'authentification avec la méthode NextJS
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    response.cookies.set('accessToken', accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 30 * 60, // 30 minutes
+    });
+    
+    response.cookies.set('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60, // 7 jours
+    });
     
     console.log('✅ Cookies sécurisés définis');
     console.log('=== FIN CONNEXION JWT ===');

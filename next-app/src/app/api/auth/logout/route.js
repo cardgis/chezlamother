@@ -13,10 +13,9 @@ export async function POST() {
       message: 'Déconnexion réussie'
     });
     
-    // Supprimer les cookies d'authentification
-    const [clearAccess, clearRefresh] = clearAuthCookies();
-    response.headers.set('Set-Cookie', clearAccess);
-    response.headers.append('Set-Cookie', clearRefresh);
+    // Supprimer les cookies d'authentification avec la méthode NextJS
+    response.cookies.delete('accessToken');
+    response.cookies.delete('refreshToken');
     
     console.log('✅ Cookies supprimés');
     console.log('=== FIN DÉCONNEXION ===');

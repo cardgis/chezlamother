@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { 
   verifyAccessToken, 
   verifyRefreshToken, 
-  generateAccessToken,
-  getTokenFromRequest,
-  getRefreshTokenFromRequest,
-  createAuthCookies 
+  generateAccessToken
 } from '@/utils/jwt';
 
 export const runtime = "nodejs";
@@ -14,13 +12,14 @@ export async function GET(request) {
   try {
     console.log('=== VÉRIFICATION TOKEN ===');
     
-    // Debug des headers et cookies avec protection
-    const cookies = request.headers.get('cookie') || '';
-    console.log('Cookies reçus:', cookies);
+    // Récupérer les cookies avec la méthode NextJS
+    const cookieStore = await cookies();
     
-    // Essayer de récupérer l'access token
-    const accessToken = getTokenFromRequest(request);
+    const accessToken = cookieStore.get('accessToken')?.value;
+    const refreshToken = cookieStore.get('refreshToken')?.value;
+    
     console.log('Access token extrait:', accessToken ? accessToken.substring(0, 20) + '...' : 'null');
+    console.log('Refresh token extrait:', refreshToken ? refreshToken.substring(0, 20) + '...' : 'null');
     
     if (accessToken) {
       try {
@@ -40,9 +39,6 @@ export async function GET(request) {
         console.log('⚠️ Access token expiré ou invalide:', accessError.message);
         
         // Access token expiré, essayer le refresh token
-        const refreshToken = getRefreshTokenFromRequest(request);
-        console.log('Refresh token extrait:', refreshToken ? refreshToken.substring(0, 20) + '...' : 'null');
-        
         if (refreshToken) {
           try {
             const payload = verifyRefreshToken(refreshToken);
@@ -66,8 +62,14 @@ export async function GET(request) {
             });
             
             // Mettre à jour le cookie access token
-            const [accessCookie] = createAuthCookies(newAccessToken, refreshToken);
-            response.headers.set('Set-Cookie', accessCookie);
+            const isProduction = process.env.NODE_ENV === 'production';
+            response.cookies.set('accessToken', newAccessToken, {
+              httpOnly: true,
+              secure: isProduction,
+              sameSite: 'lax',
+              path: '/',
+              maxAge: 30 * 60, // 30 minutes
+            });
             
             console.log('✅ Token rafraîchi pour:', payload.email);
             console.log('=== FIN VÉRIFICATION TOKEN ===');
