@@ -53,10 +53,10 @@ export default function ProductCard({ product, sectionKey }) {
       {/* Badge jour ou indisponible */}
       {/* Badge jour ou "Tous les jours" pour Yassa */}
       {shouldShowDayTag && product.dayAvailable === 'tous_les_jours' && (
-        <span className="badge left-4 top-4 absolute z-10 bg-green-600 text-white border-green-600">Tous les jours</span>
+        <span className="badge left-4 top-4 absolute z-10 text-blue-900 font-bold">Tous les jours</span>
       )}
       {shouldShowDayTag && product.dayAvailable !== 'tous_les_jours' && (
-        <span className="badge left-4 top-4 absolute z-10 bg-green-600 text-white border-green-600">{product.dayAvailable}</span>
+        <span className="badge left-4 top-4 absolute z-10 text-blue-900 font-bold">{product.dayAvailable}</span>
       )}
       {unavailable && (
         <span className="badge right-4 top-4 absolute z-10 text-red-500 font-bold">Indisponible</span>
