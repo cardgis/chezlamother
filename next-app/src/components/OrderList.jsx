@@ -101,9 +101,9 @@ export default function OrderList() {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-full overflow-x-auto">
       {/* Header avec contrôles */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold text-green-800">
           🍽️ Gestion des Commandes Cuisine
         </h2>
@@ -129,7 +129,7 @@ export default function OrderList() {
       </div>
 
       {/* Filtres */}
-      <div className="flex space-x-2 mb-6 overflow-x-auto">
+      <div className="flex flex-wrap space-x-2 mb-6 overflow-x-auto">
         <button
           onClick={() => setFilter('paid')}
           className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
@@ -176,9 +176,9 @@ export default function OrderList() {
       ) : (
         <div className="space-y-4">
           {filteredOrders.map((order) => (
-            <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow w-full text-sm">
               {/* En-tête de commande */}
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex flex-col md:flex-row justify-between items-start mb-4 gap-2">
                 <div>
                   <h3 className="text-xl font-bold text-green-800">
                     📋 Commande #{order.id}
@@ -202,7 +202,7 @@ export default function OrderList() {
               </div>
 
               {/* Détails des produits */}
-              <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <div className="bg-gray-50 rounded-lg p-4 mb-4 overflow-x-auto">
                 <h4 className="font-semibold text-gray-800 mb-3">🍽️ Détails de la commande :</h4>
                 <div className="space-y-2">
                   {order.orderItems && order.orderItems.map((item, index) => (
@@ -238,7 +238,7 @@ export default function OrderList() {
               </div>
 
               {/* Boutons d'action */}
-              <div className="flex space-x-2 justify-end">
+              <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 justify-end">
                 {(order.status === 'paid' || order.status === 'confirmed') && (
                   <button
                     onClick={() => updateOrderStatus(order.id, 'preparing')}
@@ -281,7 +281,7 @@ export default function OrderList() {
       )}
       
       {/* Statistiques */}
-      <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-green-100 p-4 rounded-lg text-center">
           <div className="text-2xl font-bold text-green-700">
             {orders.filter(o => o.status === 'paid' || o.status === 'confirmed').length}
