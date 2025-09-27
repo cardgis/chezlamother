@@ -3,42 +3,24 @@ import React, { useState, useEffect } from 'react';
 import CartModal from './CartModal';
 import { cart } from '../utils/cart';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, logout } = useAuth(); // Utiliser le hook JWT
   const router = useRouter();
 
   useEffect(() => {
     setCartCount(cart.getTotalItems());
     const update = items => setCartCount(items.reduce((t, i) => t + i.quantity, 0));
     cart.addListener(update);
-    // Gestion utilisateur connecté avec expiration
-    const checkUser = () => {
-      const currentUser = localStorage.getItem("currentUser");
-      if (currentUser) {
-        const userObj = JSON.parse(currentUser);
-        if (userObj.expiresAt && Date.now() > userObj.expiresAt) {
-          localStorage.removeItem("currentUser");
-          setUser(null);
-        } else {
-          setUser(userObj);
-        }
-      } else {
-        setUser(null);
-      }
-    };
-    checkUser();
-    window.addEventListener("storage", checkUser);
     return () => cart.removeListener(update);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    setUser(null);
-    router.push("/");
+    logout(); // Utiliser la fonction logout du hook useAuth
   };
 
   return (
