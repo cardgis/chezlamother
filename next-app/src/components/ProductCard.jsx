@@ -51,28 +51,28 @@ export default function ProductCard({ product, sectionKey }) {
     <div className={`bg-white rounded-xl2 shadow-soft hover:shadow-lift transition-transform duration-200 hover:-translate-y-1 overflow-hidden relative ${unavailable ? 'opacity-80 grayscale' : ''}`}>
       {/* Badge jour ou indisponible */}
       {shouldShowDayTag && product.dayAvailable !== 'tous_les_jours' && (
-        <span className="badge left-4 top-4 absolute z-10 bg-green-600 text-white border-green-600">{product.dayAvailable}</span>
+        <span className="badge badge-day left-4 top-4 absolute z-10">{product.dayAvailable}</span>
       )}
       {unavailable && (
-        <span className="badge right-4 top-4 absolute z-10 bg-red-500 text-white border-red-500">Indisponible</span>
+        <span className="badge badge--off right-4 top-4 absolute z-10">Indisponible</span>
       )}
-      {/* Image ronde premium, taille 400x400px */}
+      {/* Image ronde premium */}
       <div className="flex justify-center items-center mt-6 mb-2">
-        <div className="w-40 h-40 rounded-full overflow-hidden ring-2 ring-saffron/40 shadow-soft bg-cream flex items-center justify-center">
+        <div className="w-32 h-32 rounded-full overflow-hidden ring-2 ring-saffron/40 shadow-soft bg-cream flex items-center justify-center">
           <ImageWithFallback
             src={product.image || '/images/default-product.jpg'}
             alt={product.name}
-            width={400}
-            height={400}
+            width={128}
+            height={128}
             className="object-cover w-full h-full"
           />
         </div>
       </div>
       {/* Nom du produit */}
-      <h3 className="text-ink font-display text-2xl font-bold text-center mb-1">{product.name}</h3>
+      <h3 className="font-display text-xl font-semibold text-ink text-center mb-1">{product.name}</h3>
       {/* Description concise */}
       {product.shortDescription && (
-        <p className="text-slate-700 text-base text-center mb-2 font-body leading-relaxed px-4">{product.shortDescription}</p>
+        <p className="text-slate-500 text-sm text-center mb-2 font-body leading-relaxed px-4">{product.shortDescription}</p>
       )}
       {/* Prix chip colorée */}
       {product.price && (
@@ -83,14 +83,14 @@ export default function ProductCard({ product, sectionKey }) {
         <button
           onClick={handleDetails}
           disabled={unavailable}
-          className={`btn${unavailable ? ' btn-disabled bg-gray-300 text-gray-500' : ' bg-saffron text-ink hover:bg-saffron-600 hover:text-white transition'}`}
+          className={`btn btn-ghost${unavailable ? ' btn-disabled' : ' border border-primary text-primary hover:bg-primary hover:text-white transition'}`}
         >
           Détails
         </button>
         <button
           onClick={handleAddToCart}
           disabled={unavailable}
-          className={`btn${unavailable ? ' btn-disabled bg-gray-300 text-gray-500' : ' bg-primary text-white shadow-lift hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary/30 transition'}`}
+          className={`btn btn-primary${unavailable ? ' btn-disabled' : ' bg-primary text-white shadow-lift hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary/30 transition'}`}
         >
           {unavailable ? 'Indisponible' : 'Ajouter'}
         </button>
