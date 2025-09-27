@@ -39,7 +39,7 @@ const Header = () => {
             <ul className="flex flex-row space-x-6 justify-end items-center">
             <li><a href="#menu" className="text-black hover:text-green-800 transition-colors font-medium">Menu</a></li>
             <li><a href="#about" className="text-black hover:text-green-800 transition-colors font-medium">À Propos</a></li>
-            <li><a href="#contact" className="text-black hover:text-green-800 transition-colors font-medium">Contact</a></li>
+            <li><a href="#contact" className="text-black hover:text-green-800 transition-colors font-medium">Itinéraire</a></li>
             <li>
               <button
                 onClick={() => setIsCartOpen(true)}
@@ -117,7 +117,7 @@ const Header = () => {
           <ul className="flex flex-col space-y-8 text-xl font-bold">
             <li><a href="#menu" className="text-black hover:text-green-800 transition-colors" onClick={() => setIsMenuOpen(false)}>Menu</a></li>
             <li><a href="#about" className="text-black hover:text-green-800 transition-colors" onClick={() => setIsMenuOpen(false)}>À Propos</a></li>
-            <li><a href="#contact" className="text-black hover:text-green-800 transition-colors" onClick={() => setIsMenuOpen(false)}>Contact</a></li>
+            <li><a href="#contact" className="text-black hover:text-green-800 transition-colors" onClick={() => setIsMenuOpen(false)}>Itinéraire</a></li>
             <li>
               <button
                 onClick={() => { setIsCartOpen(true); setIsMenuOpen(false); }}
