@@ -21,7 +21,7 @@ const ProductSection = ({ section, products, onProductClick }) => {
         </h2>
         <p className="text-gray-600 mt-2 text-sm sm:text-base max-w-2xl mx-auto">{section.subtitle}</p>
       </div>
-      <div className={getGridClasses()}>
+  <div className={getGridClasses()} style={{ display: 'grid' }}>
         {products.map((product) => (
           <ProductCard 
             key={product.id} 
