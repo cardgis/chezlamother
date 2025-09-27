@@ -103,7 +103,6 @@ export async function POST(req) {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Content-Length': '0',
         'Cache-Control': 'no-cache',
       }
     });
