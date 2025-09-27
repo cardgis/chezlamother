@@ -12,13 +12,34 @@ const pool = new Pool({
 });
 
 export async function POST(req) {
-  const { token, password, newPassword } = await req.json();
+  let requestData;
+  
+  try {
+    // Parser le body de la requête de façon sécurisée
+    requestData = await req.json();
+  } catch (parseError) {
+    console.error('❌ Erreur parsing JSON:', parseError.message);
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Données de requête invalides' 
+    }, { 
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  
+  const { token, password, newPassword } = requestData;
   
   // Accepter soit 'password' soit 'newPassword' pour compatibilité
   const passwordToUse = newPassword || password;
   
   if (!token || !passwordToUse) {
-    return NextResponse.json({ error: 'Token et nouveau mot de passe requis' }, { status: 400 });
+    return NextResponse.json({ 
+      error: 'Token et nouveau mot de passe requis' 
+    }, { 
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   // Validation du mot de passe renforcée (même que côté client)
@@ -26,7 +47,10 @@ export async function POST(req) {
   if (!passwordRegex.test(passwordToUse)) {
     return NextResponse.json({ 
       error: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial.' 
-    }, { status: 400 });
+    }, { 
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
@@ -39,7 +63,12 @@ export async function POST(req) {
     const tokenResult = await pool.query(tokenQuery, [token]);
 
     if (tokenResult.rows.length === 0) {
-      return NextResponse.json({ error: 'Token invalide ou expiré' }, { status: 400 });
+      return NextResponse.json({ 
+        error: 'Token invalide ou expiré' 
+      }, { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     const { email } = tokenResult.rows[0];
@@ -70,15 +99,27 @@ export async function POST(req) {
     return NextResponse.json({ 
       success: true, 
       message: 'Mot de passe réinitialisé avec succès' 
-    }, { status: 200 });
+    }, { 
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
 
   } catch (error) {
-    console.error('=== ERREUR RESET PASSWORD ===')
+    console.error('=== ERREUR RESET PASSWORD ===');
     console.error('Message:', error.message);
+    console.error('Stack:', error.stack);
     console.error('==============================');
+    
     return NextResponse.json({ 
       success: false, 
       error: 'Erreur lors de la réinitialisation du mot de passe' 
-    }, { status: 500 });
+    }, { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
   }
 }
