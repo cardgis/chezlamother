@@ -6,12 +6,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 function ResetPasswordContent() {
   const router = useRouter();
   const params = useSearchParams();
-  const token = params.get("token") || "";
+  const [storedToken, setStoredToken] = useState("");
   
+  // Récupérer le token de l'URL une seule fois et le cacher
   React.useEffect(() => {
-    // Ne pas supprimer le token de l'URL - on en a besoin !
-    console.log("Token reçu:", token);
-  }, [token]);
+    const urlToken = params.get("token");
+    if (urlToken && !storedToken) {
+      setStoredToken(urlToken);
+      // Nettoyer l'URL en supprimant le token
+      const url = window.location.pathname;
+      window.history.replaceState({}, '', url);
+      console.log("Token récupéré et URL nettoyée");
+    }
+  }, [params, storedToken]);
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,7 +65,7 @@ function ResetPasswordContent() {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ token: storedToken, password }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -75,7 +82,7 @@ function ResetPasswordContent() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      {!token ? (
+      {!storedToken ? (
         <form className="bg-white p-8 rounded shadow w-full max-w-sm" onSubmit={handleSendEmail}>
           <h2 className="text-2xl font-bold mb-6 text-center">Réinitialiser le mot de passe</h2>
           <input
