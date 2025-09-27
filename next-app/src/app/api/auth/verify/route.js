@@ -14,8 +14,8 @@ export async function GET(request) {
   try {
     console.log('=== VÉRIFICATION TOKEN ===');
     
-    // Debug des headers et cookies
-    const cookies = request.headers.get('cookie');
+    // Debug des headers et cookies avec protection
+    const cookies = request.headers.get('cookie') || '';
     console.log('Cookies reçus:', cookies);
     
     // Essayer de récupérer l'access token

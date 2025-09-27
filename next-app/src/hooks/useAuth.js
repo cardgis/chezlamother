@@ -28,7 +28,15 @@ export function AuthProvider({ children }) {
   const checkAuth = async () => {
     try {
       console.log('🔍 Vérification authentification...');
-      console.log('🍪 Document cookies:', typeof window !== 'undefined' ? document.cookie : 'N/A');
+      
+      // Vérifier que nous sommes côté client
+      if (typeof window === 'undefined') {
+        console.log('⚠️ Côté serveur - skip auth check');
+        setLoading(false);
+        return;
+      }
+      
+      console.log('🍪 Document cookies:', document.cookie);
       
       const res = await fetch('/api/auth/verify', {
         method: 'GET',
@@ -39,10 +47,19 @@ export function AuthProvider({ children }) {
       });
 
       console.log('📊 Réponse verify - Status:', res.status);
+      
+      if (!res.ok) {
+        console.log('❌ Réponse non-OK:', res.status);
+        setUser(null);
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+      
       const data = await res.json();
       console.log('📊 Réponse verify - Data:', data);
 
-      if (res.ok && data.valid) {
+      if (data.valid) {
         console.log('✅ Utilisateur authentifié:', data.user);
         setUser(data.user);
         setIsAuthenticated(true);

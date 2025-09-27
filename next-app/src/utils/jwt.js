@@ -62,22 +62,32 @@ export function verifyRefreshToken(token) {
  * Extraire le token des cookies de la requête
  */
 export function getTokenFromRequest(request) {
-  const cookies = request.headers.get('cookie');
-  if (!cookies) return null;
-  
-  const accessTokenMatch = cookies.match(/accessToken=([^;]+)/);
-  return accessTokenMatch ? accessTokenMatch[1] : null;
+  try {
+    const cookies = request.headers.get('cookie');
+    if (!cookies || typeof cookies !== 'string') return null;
+    
+    const accessTokenMatch = cookies.match(/accessToken=([^;]+)/);
+    return accessTokenMatch ? decodeURIComponent(accessTokenMatch[1]) : null;
+  } catch (error) {
+    console.error('Erreur extraction access token:', error);
+    return null;
+  }
 }
 
 /**
  * Extraire le refresh token des cookies de la requête
  */
 export function getRefreshTokenFromRequest(request) {
-  const cookies = request.headers.get('cookie');
-  if (!cookies) return null;
-  
-  const refreshTokenMatch = cookies.match(/refreshToken=([^;]+)/);
-  return refreshTokenMatch ? refreshTokenMatch[1] : null;
+  try {
+    const cookies = request.headers.get('cookie');
+    if (!cookies || typeof cookies !== 'string') return null;
+    
+    const refreshTokenMatch = cookies.match(/refreshToken=([^;]+)/);
+    return refreshTokenMatch ? decodeURIComponent(refreshTokenMatch[1]) : null;
+  } catch (error) {
+    console.error('Erreur extraction refresh token:', error);
+    return null;
+  }
 }
 
 /**
