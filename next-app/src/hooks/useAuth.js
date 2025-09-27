@@ -28,13 +28,19 @@ export function AuthProvider({ children }) {
   const checkAuth = async () => {
     try {
       console.log('🔍 Vérification authentification...');
+      console.log('🍪 Document cookies:', typeof window !== 'undefined' ? document.cookie : 'N/A');
       
       const res = await fetch('/api/auth/verify', {
         method: 'GET',
         credentials: 'include', // Inclure les cookies
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
+      console.log('📊 Réponse verify - Status:', res.status);
       const data = await res.json();
+      console.log('📊 Réponse verify - Data:', data);
 
       if (res.ok && data.valid) {
         console.log('✅ Utilisateur authentifié:', data.user);
@@ -45,7 +51,7 @@ export function AuthProvider({ children }) {
           console.log('🔄 Token rafraîchi automatiquement');
         }
       } else {
-        console.log('❌ Non authentifié');
+        console.log('❌ Non authentifié:', data);
         setUser(null);
         setIsAuthenticated(false);
       }

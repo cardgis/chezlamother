@@ -14,8 +14,13 @@ export async function GET(request) {
   try {
     console.log('=== VÉRIFICATION TOKEN ===');
     
+    // Debug des headers et cookies
+    const cookies = request.headers.get('cookie');
+    console.log('Cookies reçus:', cookies);
+    
     // Essayer de récupérer l'access token
     const accessToken = getTokenFromRequest(request);
+    console.log('Access token extrait:', accessToken ? accessToken.substring(0, 20) + '...' : 'null');
     
     if (accessToken) {
       try {
@@ -32,10 +37,11 @@ export async function GET(request) {
         });
         
       } catch (accessError) {
-        console.log('⚠️ Access token expiré, tentative refresh...');
+        console.log('⚠️ Access token expiré ou invalide:', accessError.message);
         
         // Access token expiré, essayer le refresh token
         const refreshToken = getRefreshTokenFromRequest(request);
+        console.log('Refresh token extrait:', refreshToken ? refreshToken.substring(0, 20) + '...' : 'null');
         
         if (refreshToken) {
           try {

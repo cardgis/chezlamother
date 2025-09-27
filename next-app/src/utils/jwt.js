@@ -89,7 +89,7 @@ export function getSecureCookieOptions() {
   return {
     httpOnly: true,
     secure: isProduction, // HTTPS uniquement en production
-    sameSite: isProduction ? 'strict' : 'lax',
+    sameSite: 'lax', // Lax au lieu de strict pour éviter les problèmes de cross-site
     path: '/',
   };
 }
