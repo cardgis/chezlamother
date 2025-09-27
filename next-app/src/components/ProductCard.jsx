@@ -75,9 +75,11 @@ export default function ProductCard({ product, sectionKey }) {
       {product.shortDescription && (
         <p className="text-slate-700 text-base text-center mb-2 font-body leading-relaxed px-4">{product.shortDescription}</p>
       )}
-      {/* Prix chip colorée */}
+      {/* Prix chip améliorée */}
       {product.price && (
-        <div className="price-chip bg-saffron text-ink font-bold shadow-soft border border-saffron/30 mx-auto">{formatPrice(product.price)}</div>
+        <div className="bg-yellow-400 text-blue-900 font-bold text-lg px-5 py-2 rounded-full shadow-soft mx-auto" style={{border: 'none', letterSpacing: '1px'}}>
+          {formatPrice(product.price)}
+        </div>
       )}
       {/* Boutons actions */}
       <div className="flex justify-center gap-2 mt-4 mb-6">
