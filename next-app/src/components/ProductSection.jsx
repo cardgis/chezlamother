@@ -6,24 +6,8 @@ const ProductSection = ({ section, products, onProductClick }) => {
 
   // Toutes les sections produits sauf la map sont centrées avec marges
   const getGridClasses = () => {
-    if (["plats_midi", "a_la_carte", "accompagnements"].includes(section.key)) {
-      return "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto max-w-6xl justify-items-center";
-    }
-    if (["pizzas", "boissons", "desserts"].includes(section.key)) {
-      return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mx-auto max-w-6xl justify-items-center";
-    }
-    // Si une autre section produit est ajoutée avant la map, appliquer le même style
-    if (["suivante", "avant_map"].includes(section.key)) {
-      return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mx-auto max-w-6xl justify-items-center";
-    }
-    if (section.columnsPerRow === 5) {
-      return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6";
-    }
-    // Centrer les sections avec peu de produits (moins de 3)
-    const shouldCenter = products.length < 3;
-    return shouldCenter 
-      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 justify-items-center"
-      : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6";
+    // Toutes les sections produits affichent 1 à 4 colonnes selon la taille d'écran
+    return "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mx-auto max-w-6xl justify-items-center";
   };
 
   return (
