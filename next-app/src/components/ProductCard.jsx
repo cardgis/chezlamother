@@ -53,43 +53,44 @@ export default function ProductCard({ product, sectionKey }) {
       {shouldShowDayTag && product.dayAvailable !== 'tous_les_jours' && (
         <span className="badge badge-day">{product.dayAvailable}</span>
       )}
-      {/* Image vignette */}
-      <div className="menu-thumb">
+      {/* Image vignette optimisée */}
+      <div className="menu-thumb bg-cream ring-2 ring-saffron/40 shadow-soft">
         {product.image ? (
           <ImageWithFallback
             src={product.image}
             alt={product.name}
             width={208}
             height={208}
-            className=""
+            className="object-cover w-full h-full rounded-full"
+            style={{maxWidth:'208px',maxHeight:'208px'}}
           />
         ) : (
           <span className="menu-thumb--ph">Image à venir</span>
         )}
       </div>
       {/* Nom du produit */}
-      <h3 className="menu-name mb-1">{product.name}</h3>
+      <h3 className="menu-name mb-1 text-primary font-display text-xl">{product.name}</h3>
       {/* Description courte */}
       {product.shortDescription && (
-        <p className="menu-desc">{product.shortDescription}</p>
+        <p className="menu-desc text-slate-500 text-sm mb-2 font-body leading-relaxed">{product.shortDescription}</p>
       )}
       {/* Prix */}
       {product.price && (
-        <div className="price-chip">{formatPrice(product.price)}</div>
+        <div className="price-chip bg-saffron text-ink font-bold shadow-soft border border-saffron/30">{formatPrice(product.price)}</div>
       )}
       {/* Boutons actions */}
       <div className="flex justify-center gap-2 mt-4">
         <button
           onClick={handleDetails}
           disabled={unavailable}
-          className={`btn btn-ghost${unavailable ? ' btn-disabled' : ''}`}
+          className={`btn btn-ghost${unavailable ? ' btn-disabled' : ' border border-primary text-primary hover:bg-primary hover:text-white transition'}`}
         >
           Détails
         </button>
         <button
           onClick={handleAddToCart}
           disabled={unavailable}
-          className={`btn btn-primary${unavailable ? ' btn-disabled' : ''}`}
+          className={`btn btn-primary${unavailable ? ' btn-disabled' : ' bg-primary text-white shadow-lift hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary/30 transition'}`}
         >
           {unavailable ? 'Indisponible' : 'Ajouter'}
         </button>
