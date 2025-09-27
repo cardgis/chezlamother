@@ -46,87 +46,63 @@ export default function ProductCard({ product, sectionKey }) {
     }
   };
 
+  // ...existing code...
   const unavailable = (sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && !isGloballyAvailable);
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
-      <div className="relative">
-        <ImageWithFallback
-          src={product.image || '/images/default-product.jpg'}
-          alt={product.name}
-          width={400}
-          height={250}
-          className="w-full h-48 object-cover"
-        />
-        {product.price && (
-          <div className="absolute top-2 right-2 bg-black text-white px-2 py-1 rounded text-sm font-medium">
-            {formatPrice(product.price)}
-          </div>
-        )}
-        {shouldShowDayTag && product.dayAvailable !== 'tous_les_jours' && (
-          <div className="absolute top-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">
-            {product.dayAvailable}
-          </div>
-        )}
-      </div>
-
-      <div className="p-4">
-        <h3 className="font-semibold text-lg mb-2 text-gray-800">{product.name}</h3>
-
-        {product.shortDescription && (
-          <p className="text-gray-600 text-sm mb-4">{product.shortDescription}</p>
-        )}
-
-        <div className="flex justify-between items-center mt-4 gap-2">
-          <button
-            onClick={handleDetails}
-            disabled={
-              (sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours')) ||
-              (sectionKey !== 'plats_midi' && !isGloballyAvailable)
-            }
-            className={`
-              px-3 py-1.5 rounded text-xs font-medium transition-colors
-              ${(sectionKey === 'plats_midi' && (isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && isGloballyAvailable)
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }
-            `}
-          >
-            Détails
-          </button>
-
-          <button
-            onClick={handleAddToCart}
-            disabled={
-              (sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours')) ||
-              (sectionKey !== 'plats_midi' && !isGloballyAvailable)
-            }
-            className={`
-              px-3 py-1.5 rounded text-xs font-medium transition-colors
-              ${(sectionKey === 'plats_midi' && (isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && isGloballyAvailable)
-                ? 'bg-green-600 text-white hover:bg-green-700'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }
-            `}
-          >
-            {(sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && !isGloballyAvailable)
-              ? 'Indisponible'
-              : 'Ajouter'
-            }
-          </button>
+    <div className={`bg-white rounded-xl2 shadow-soft hover:shadow-lift transition-transform duration-200 hover:-translate-y-1 overflow-hidden relative ${unavailable ? 'opacity-80 grayscale' : ''}`}>
+      {/* Badge jour ou indisponible */}
+      {shouldShowDayTag && product.dayAvailable !== 'tous_les_jours' && (
+        <span className="badge badge-day left-4 top-4 absolute z-10">{product.dayAvailable}</span>
+      )}
+      {unavailable && (
+        <span className="badge badge--off right-4 top-4 absolute z-10">Indisponible</span>
+      )}
+      {/* Image ronde premium */}
+      <div className="flex justify-center items-center mt-6 mb-2">
+        <div className="w-32 h-32 rounded-full overflow-hidden ring-2 ring-saffron/40 shadow-soft bg-cream flex items-center justify-center">
+          <ImageWithFallback
+            src={product.image || '/images/default-product.jpg'}
+            alt={product.name}
+            width={128}
+            height={128}
+            className="object-cover w-full h-full"
+          />
         </div>
-
-        {(sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours')) && (
-          <p className="text-red-500 text-xs mt-2">
-            Disponible le {product.dayAvailable}
-          </p>
-        )}
-
-        {(sectionKey !== 'plats_midi' && !isGloballyAvailable) && (
-          <p className="text-red-500 text-xs mt-2">
-            Produit temporairement indisponible
-          </p>
-        )}
       </div>
+      {/* Nom du produit */}
+      <h3 className="font-display text-xl font-semibold text-ink text-center mb-1">{product.name}</h3>
+      {/* Description concise */}
+      {product.shortDescription && (
+        <p className="text-slate-500 text-sm text-center mb-2 font-body leading-relaxed px-4">{product.shortDescription}</p>
+      )}
+      {/* Prix chip colorée */}
+      {product.price && (
+        <div className="price-chip bg-saffron text-ink font-bold shadow-soft border border-saffron/30 mx-auto">{formatPrice(product.price)}</div>
+      )}
+      {/* Boutons actions */}
+      <div className="flex justify-center gap-2 mt-4 mb-6">
+        <button
+          onClick={handleDetails}
+          disabled={unavailable}
+          className={`btn btn-ghost${unavailable ? ' btn-disabled' : ' border border-primary text-primary hover:bg-primary hover:text-white transition'}`}
+        >
+          Détails
+        </button>
+        <button
+          onClick={handleAddToCart}
+          disabled={unavailable}
+          className={`btn btn-primary${unavailable ? ' btn-disabled' : ' bg-primary text-white shadow-lift hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary/30 transition'}`}
+        >
+          {unavailable ? 'Indisponible' : 'Ajouter'}
+        </button>
+      </div>
+      {/* Message d'indisponibilité */}
+      {sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours') && (
+        <p className="text-red-500 text-xs text-center mb-2">Disponible le {product.dayAvailable}</p>
+      )}
+      {sectionKey !== 'plats_midi' && !isGloballyAvailable && (
+        <p className="text-red-500 text-xs text-center mb-2">Produit temporairement indisponible</p>
+      )}
     </div>
   );
 }
