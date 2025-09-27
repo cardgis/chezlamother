@@ -90,7 +90,7 @@ export default function ProductCard({ product, sectionKey }) {
         <button
           onClick={handleDetails}
           disabled={unavailable}
-          className={`btn${unavailable ? ' btn-disabled bg-gray-300 text-gray-500' : ' bg-saffron text-black hover:bg-saffron-600 hover:text-white transition'}`}
+          className={`btn${unavailable ? ' btn-disabled bg-gray-300 text-gray-500' : ' bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition'}`}
         >
           Détails
         </button>
