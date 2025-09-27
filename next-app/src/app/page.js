@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Header from '../components/Header';
 import ProductSection from '../components/ProductSection';
 import { fetchProductsData, productSections, formatPrice } from '../utils/products';
+import AddressDistanceMap from '../components/AddressDistanceMap';
 
 const LeafletMapChezLaMother = dynamic(() => import('../components/LeafletMapChezLaMother'), { ssr: false });
 
@@ -92,6 +93,10 @@ export default function Home() {
                 Chercher
               </button>
             </div>
+          </div>
+          {/* Ajout du composant optimisé pour la recherche d'adresse et la distance */}
+          <div className="w-full mt-4">
+            <AddressDistanceMap />
           </div>
         </div>
   <div className="w-full lg:w-1/3 flex justify-center items-center mt-6 lg:mt-0">
