@@ -6,11 +6,10 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("client");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -25,7 +24,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role, phone }),
+        body: JSON.stringify({ name, email, password, role: "client", phone }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -84,10 +83,6 @@ export default function RegisterPage() {
           </div>
         </div>
         <input type="text" placeholder="Numéro de téléphone" className="w-full mb-4 p-2 border rounded text-black" value={phone} onChange={e => setPhone(e.target.value)} title="Format Sénégal: +221 78 879 43 71 ou +221788794371" required />
-        <select className="w-full mb-6 p-2 border rounded text-black" value={role} onChange={e => setRole(e.target.value)}>
-          <option value="client" className="text-black">Client</option>
-          <option value="admin" className="text-black">Admin</option>
-        </select>
         <button type="submit" className="w-full bg-green-700 text-white py-2 rounded font-semibold">S'inscrire</button>
         <div className="mt-4 text-center">
           <a href="/auth/login" className="text-green-700 underline">Déjà un compte ? Se connecter</a>
