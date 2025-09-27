@@ -77,8 +77,8 @@ export default function ProductCard({ product, sectionKey }) {
       )}
       {/* Prix chip améliorée */}
       {product.price && (
-        <div className="bg-yellow-400 text-blue-900 font-bold text-lg px-5 py-2 rounded-full shadow-soft mx-auto" style={{border: 'none', letterSpacing: '1px'}}>
-          {formatPrice(product.price)}
+        <div className="bg-yellow-400 text-blue-900 font-bold text-lg px-5 py-2 rounded-full shadow-soft mx-auto flex justify-center items-center" style={{border: 'none', letterSpacing: '1px'}}>
+          <span style={{borderBottom: '2px solid #FFD600', padding: '0 4px', borderRadius: '4px', display: 'inline-block'}}>{formatPrice(product.price)}</span>
         </div>
       )}
       {/* Boutons actions */}
