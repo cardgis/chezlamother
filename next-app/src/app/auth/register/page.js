@@ -9,6 +9,7 @@ export default function RegisterPage() {
   const [role, setRole] = useState("client");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleRegister = async (e) => {
@@ -43,9 +44,26 @@ export default function RegisterPage() {
       <form className="bg-white p-8 rounded shadow w-full max-w-sm" onSubmit={handleRegister}>
         <h2 className="text-2xl font-bold mb-6 text-center">Inscription</h2>
         {error && <div className="text-red-600 mb-4 text-center">{error}</div>}
-  <input type="text" placeholder="Nom" className="w-full mb-4 p-2 border rounded text-black" value={name} onChange={e => setName(e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))} required />
+        <input type="text" placeholder="Nom" className="w-full mb-4 p-2 border rounded text-black" value={name} onChange={e => setName(e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))} required />
         <input type="email" placeholder="Email" className="w-full mb-4 p-2 border rounded text-black" value={email} onChange={e => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Mot de passe" className="w-full mb-2 p-2 border rounded text-black" value={password} onChange={e => setPassword(e.target.value)} required />
+        <div className="relative mb-2">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Mot de passe"
+            className="w-full p-2 border rounded text-black pr-16"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            className="absolute right-2 top-2 text-green-700 underline bg-transparent border-none cursor-pointer text-sm"
+            onClick={() => setShowPassword((v) => !v)}
+            tabIndex={-1}
+          >
+            {showPassword ? "Masquer" : "Afficher"}
+          </button>
+        </div>
         {/* Password rules with live indicators */}
         <div className="mb-4 text-sm">
           <div className="flex items-center mb-1">
@@ -65,7 +83,7 @@ export default function RegisterPage() {
             <span className="text-black">Un caractère spécial</span>
           </div>
         </div>
-  <input type="text" placeholder="Numéro de téléphone" className="w-full mb-4 p-2 border rounded text-black" value={phone} onChange={e => setPhone(e.target.value)} title="Format Sénégal: +221 78 879 43 71 ou +221788794371" required />
+        <input type="text" placeholder="Numéro de téléphone" className="w-full mb-4 p-2 border rounded text-black" value={phone} onChange={e => setPhone(e.target.value)} title="Format Sénégal: +221 78 879 43 71 ou +221788794371" required />
         <select className="w-full mb-6 p-2 border rounded text-black" value={role} onChange={e => setRole(e.target.value)}>
           <option value="client" className="text-black">Client</option>
           <option value="admin" className="text-black">Admin</option>
