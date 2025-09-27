@@ -56,7 +56,8 @@ export async function POST(request) {
     const payload = { 
       userId: user.id,
       email: user.email, 
-      role: user.role 
+      role: user.role,
+      name: user.name
     };
     
     const accessToken = generateAccessToken(payload);

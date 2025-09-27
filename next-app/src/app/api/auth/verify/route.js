@@ -31,7 +31,8 @@ export async function GET(request) {
           user: {
             id: payload.userId,
             email: payload.email,
-            role: payload.role
+            role: payload.role,
+            name: payload.name || null
           }
         });
         
@@ -57,7 +58,8 @@ export async function GET(request) {
               user: {
                 id: payload.userId,
                 email: payload.email,
-                role: payload.role
+                role: payload.role,
+                name: payload.name || null
               }
             });
             
