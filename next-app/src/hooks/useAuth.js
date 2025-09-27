@@ -86,6 +86,10 @@ export function AuthProvider({ children }) {
     console.log('✅ Connexion réussie:', userData);
     setUser(userData);
     setIsAuthenticated(true);
+    // Sauvegarder l'utilisateur dans localStorage pour CartModal
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+    }
   };
 
   // Fonction de déconnexion
