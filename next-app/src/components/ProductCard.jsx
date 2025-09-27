@@ -51,6 +51,10 @@ export default function ProductCard({ product, sectionKey }) {
   return (
     <div className={`bg-white rounded-xl2 shadow-soft hover:shadow-lift transition-transform duration-200 hover:-translate-y-1 overflow-hidden relative${unavailable ? ' opacity-80' : ''}`}>
       {/* Badge jour ou indisponible */}
+      {/* Badge jour ou "Tous les jours" pour Yassa */}
+      {shouldShowDayTag && product.dayAvailable === 'tous_les_jours' && (
+        <span className="badge left-4 top-4 absolute z-10 bg-green-600 text-white border-green-600">Tous les jours</span>
+      )}
       {shouldShowDayTag && product.dayAvailable !== 'tous_les_jours' && (
         <span className="badge left-4 top-4 absolute z-10 bg-green-600 text-white border-green-600">{product.dayAvailable}</span>
       )}
