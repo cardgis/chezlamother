@@ -97,7 +97,7 @@ export default function ProductCard({ product, sectionKey }) {
         <button
           onClick={handleAddToCart}
           disabled={unavailable}
-          className={`btn${unavailable ? ' btn-disabled bg-gray-300 text-gray-500' : ' bg-primary text-white shadow-lift hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary/30 transition'}`}
+          className={`btn${unavailable ? ' btn-disabled bg-gray-300 text-gray-500' : ' bg-green-600 text-white rounded-lg shadow-lift hover:opacity-80 transition-opacity duration-200'}`}
         >
           {unavailable ? 'Indisponible' : 'Ajouter'}
         </button>
