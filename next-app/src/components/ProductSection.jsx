@@ -32,12 +32,11 @@ const ProductSection = ({ section, products, onProductClick }) => {
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
           <span className="inline-flex items-center gap-2 sm:gap-3 text-lg sm:text-xl lg:text-2xl">
             {section.icon ? <section.icon size={32} color="#ff9800" /> : null}
-            <span className="border-b-4 border-orange-400 text-black align-middle">{section.title}</span>
+            <span className="border-b-4 border-yellow-400 text-blue-900 align-middle">{section.title}</span>
           </span>
         </h2>
         <p className="text-gray-600 mt-2 text-sm sm:text-base max-w-2xl mx-auto">{section.subtitle}</p>
       </div>
-      
       <div className={getGridClasses()}>
         {products.map((product) => (
           <ProductCard 
