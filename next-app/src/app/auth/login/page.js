@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const { login, checkAuth, user, isAuthenticated } = useAuth();
   const [redirecting, setRedirecting] = useState(false);
@@ -61,7 +62,24 @@ export default function LoginPage() {
         <h2 className="text-2xl font-bold mb-6 text-center">Connexion</h2>
         {error && <div className="text-red-600 mb-4 text-center">{error}</div>}
         <input type="email" placeholder="Email" className="w-full mb-4 p-2 border rounded text-black" value={email} onChange={e => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Mot de passe" className="w-full mb-6 p-2 border rounded text-black" value={password} onChange={e => setPassword(e.target.value)} required />
+        <div className="relative mb-6">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Mot de passe"
+            className="w-full p-2 border rounded text-black pr-16"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            className="absolute right-2 top-2 text-green-700 underline bg-transparent border-none cursor-pointer text-sm"
+            onClick={() => setShowPassword((v) => !v)}
+            tabIndex={-1}
+          >
+            {showPassword ? "Masquer" : "Afficher"}
+          </button>
+        </div>
         <button 
           type="submit" 
           disabled={loading}
