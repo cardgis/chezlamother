@@ -28,9 +28,19 @@ export default function OrderStatusPage() {
     setLoading(false);
   };
 
+  // Redirection vers la page paiement si commande validée
+  React.useEffect(() => {
+    if (order && order.status === 'validée') {
+      const timer = setTimeout(() => {
+        window.location.href = `/paiement?orderId=${order.id}`;
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [order]);
+
   return (
-  <div className="max-w-lg mx-auto mt-12 p-6 bg-white rounded-lg shadow text-black">
-  <h1 className="text-2xl font-bold mb-4 text-center">Suivi de commande</h1>
+    <div className="max-w-lg mx-auto mt-12 p-6 bg-white rounded-lg shadow text-black">
+      <h1 className="text-2xl font-bold mb-4 text-center">Suivi de commande</h1>
       <div className="mb-4">
         <label className="block mb-2 font-semibold text-black">Numéro de commande :</label>
         <input
@@ -55,10 +65,6 @@ export default function OrderStatusPage() {
           {order.status === 'validée' && (
             <>
               <div className="text-center text-green-700 font-bold text-xl">Votre commande est validée !</div>
-              {/* Redirection vers la page de paiement après 2 secondes */}
-              {typeof window !== 'undefined' && setTimeout(() => {
-                window.location.href = `/paiement?orderId=${order.id}`;
-              }, 2000)}
               <div className="text-center text-black mt-2 text-sm">Redirection vers la page de paiement...</div>
             </>
           )}
