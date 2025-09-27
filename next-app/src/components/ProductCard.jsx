@@ -55,7 +55,7 @@ export default function ProductCard({ product, sectionKey }) {
         <span className="badge left-4 top-4 absolute z-10 bg-green-600 text-white border-green-600">{product.dayAvailable}</span>
       )}
       {unavailable && (
-        <span className="badge right-4 top-4 absolute z-10 bg-red-500 text-white border-red-500">Indisponible</span>
+        <span className="badge right-4 top-4 absolute z-10 text-red-500 font-bold">Indisponible</span>
       )}
       {/* Image ronde premium, taille 400x400px */}
       <div className="flex justify-center items-center mt-6 mb-2">
