@@ -152,7 +152,7 @@ const Header = () => {
         <div className="flex justify-center items-center mt-2 mb-2">
           <h2 className="text-2xl font-bold text-center animate-bounce text-black">
             {`Bienvenue, `}
-            {user.name.split('').map((char, i) => (
+            {(user.name || user.email || 'Utilisateur').split('').map((char, i) => (
               <span
                 key={i}
                 className={`inline-block transition-all duration-300 ease-in-out px-1 rounded ${i % 2 === 0 ? 'text-green-700' : 'text-green-400'} hover:scale-125 hover:bg-green-100`}
