@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Base ---------- */
+@layer base {
+  html { @apply font-body text-slate-600 bg-cream; }
+  h1,h2,h3 { @apply font-display text-ink; }
+}
+
+/* ---------- Composants menu ---------- */
+@layer components {
+  .section-title    { @apply text-2xl md:text-3xl font-semibold text-ink tracking-tight; }
+  .section-subtitle { @apply text-sm text-slate-500 mt-1; }
+  .menu-card {
+    @apply bg-card rounded-xl2 p-6 text-center shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift;
+  }
+  .menu-card.is-unavailable { @apply opacity-90 ring-1 ring-slate-200; }
+  .menu-thumb      { @apply w-52 h-52 mx-auto rounded-full overflow-hidden ring-1 ring-slate-100 mb-4 bg-slate-50 grid place-items-center; }
+  .menu-thumb img  { @apply w-full h-full object-cover; }
+  .menu-thumb--ph  { @apply text-[11px] text-slate-500; }
+  .badge                 { @apply absolute left-4 top-4 text-[11px] px-3 py-1 rounded-full border; }
+  .badge--cat            { @apply bg-rose-50 text-primary border-rose-100; }
+  .badge--off            { @apply bg-slate-50 text-slate-600 border-slate-200; }
+  .badge-day             { @apply mt-2 inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100; }
+  .menu-name  { @apply text-lg font-semibold text-ink; }
+  .menu-desc  { @apply mt-1 text-xs text-slate-500 leading-relaxed; }
+  .price-chip { @apply mt-3 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-saffron text-ink text-sm font-bold; }
+  .btn        { @apply inline-flex items-center justify-center px-5 py-2 rounded-full text-sm font-semibold transition; }
+  .btn-primary{ @apply bg-primary text-white shadow-soft hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary/30; }
+  .btn-ghost  { @apply bg-white text-ink ring-1 ring-slate-200 hover:ring-slate-300; }
+  .btn-disabled{ @apply bg-slate-200 text-slate-500 cursor-not-allowed; }
+  .section-head { @apply flex flex-col items-center text-center gap-1; }
+}
+
+@layer utilities {
+  .container-narrow { @apply max-w-6xl mx-auto px-4; }
+}
