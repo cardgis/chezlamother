@@ -22,13 +22,27 @@ export default function ProductCard({ product, sectionKey }) {
 
   const handleAddToCart = () => {
     if ((sectionKey === 'plats_midi' && (isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && isGloballyAvailable)) {
-      cart.add(product);
-      router.push('/paiement');
+      cart.addItem(product, 1);
     }
   };
 
   const handleDetails = () => {
-    router.push(`/product/${product.id}`);
+    if ((sectionKey === 'plats_midi' && (isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && isGloballyAvailable)) {
+      function slugify(str) {
+        return str
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/['']/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/[()]/g, '')
+          .replace(/[^a-zA-Z0-9\-]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '')
+          .toLowerCase();
+      }
+      const slug = product.slug || slugify(product.name);
+      router.push(`/product/${slug}`);
+    }
   };
 
   const unavailable = (sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && !isGloballyAvailable);
