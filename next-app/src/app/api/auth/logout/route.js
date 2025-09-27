@@ -1,0 +1,33 @@
+import { NextResponse } from 'next/server';
+import { clearAuthCookies } from '@/utils/jwt';
+
+export const runtime = "nodejs";
+
+export async function POST() {
+  try {
+    console.log('=== DÉCONNEXION ===');
+    
+    // Créer la réponse
+    const response = NextResponse.json({ 
+      success: true,
+      message: 'Déconnexion réussie'
+    });
+    
+    // Supprimer les cookies d'authentification
+    const [clearAccess, clearRefresh] = clearAuthCookies();
+    response.headers.set('Set-Cookie', clearAccess);
+    response.headers.append('Set-Cookie', clearRefresh);
+    
+    console.log('✅ Cookies supprimés');
+    console.log('=== FIN DÉCONNEXION ===');
+    
+    return response;
+    
+  } catch (error) {
+    console.error('Erreur déconnexion:', error);
+    return NextResponse.json(
+      { error: 'Erreur lors de la déconnexion' }, 
+      { status: 500 }
+    );
+  }
+}
