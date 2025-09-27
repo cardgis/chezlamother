@@ -8,10 +8,9 @@ export default function WaveQRPayment({ order, onPaymentSuccess, onClose }) {
   const [checkingInterval, setCheckingInterval] = useState(null);
 
   // QR Code Wave - URL ou données à configurer selon votre QR Wave
-  const waveQRData = `wave://pay?amount=${order.totalAmount}&reference=CMD${order.id}&merchant=ChezLaMother`;
-  
-  // Alternative : URL simple pour redirection
-  const waveURL = `https://wave.com/pay?amount=${order.totalAmount}&reference=CMD${order.id}`;
+  // Nouveau lien de paiement Wave fourni
+  const waveQRData = `https://pay.wave.com/m/M_sn_kaBpQqVj8vG-/c/sn/`;
+  const waveURL = waveQRData;
 
   useEffect(() => {
     // Décompte du temps
