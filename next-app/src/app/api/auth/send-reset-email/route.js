@@ -73,7 +73,7 @@ export async function POST(req) {
     client.release();
 
     // Lien de réinitialisation
-    const baseUrl = 'https://chezlamother.vercel.app';
+    const baseUrl = 'https://chezlamother.sn';
     const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
     console.log('🔗 Reset URL créée');
 
@@ -105,7 +105,7 @@ export async function POST(req) {
           }
         }],
         from: { 
-          email: "alexandrenasalan1@outlook.fr", 
+          email: "noreply@chezlamother.sn", 
           name: "Chez La Mother" 
         },
         template_id: templateId

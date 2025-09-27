@@ -9,10 +9,8 @@ function ResetPasswordContent() {
   const token = params.get("token") || "";
   
   React.useEffect(() => {
-    if (typeof window !== "undefined" && token) {
-      const url = window.location.pathname;
-      window.history.replaceState({}, '', url);
-    }
+    // Ne pas supprimer le token de l'URL - on en a besoin !
+    console.log("Token reçu:", token);
   }, [token]);
   
   const [email, setEmail] = useState("");
