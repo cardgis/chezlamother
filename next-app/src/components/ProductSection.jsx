@@ -33,7 +33,7 @@ const ProductSection = ({ section, products, onProductClick }) => {
             <span className="inline-flex items-center gap-2 sm:gap-3 text-lg sm:text-xl lg:text-2xl">
               {section.icon ? <section.icon size={32} color="#ff9800" /> : null}
               {/* Titre bleu de nuit et souligné jaune pour les sections demandées */}
-              {['Grillades à la Carte', 'Accompagnements', 'Pizzas Artisanales', 'Boissons Traditionnelles'].includes(section.title) ? (
+              {['Grillades à la Carte', 'Accompagnements', 'Pizzas Artisanales', 'Boissons Traditionnelles', 'Plats du Midi', 'Desserts Gourmands'].includes(section.title) ? (
                 <span className="border-b-4 border-yellow-400 text-blue-900 align-middle">{section.title}</span>
               ) : (
                 <span className="border-b-4 border-orange-400 text-black align-middle">{section.title}</span>
