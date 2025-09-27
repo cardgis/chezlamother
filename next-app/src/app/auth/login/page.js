@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -9,12 +9,24 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, checkAuth, user, isAuthenticated } = useAuth();
+  const [redirecting, setRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (redirecting && isAuthenticated && user) {
+      if (user.role === "admin") {
+        router.push("/admin/orders");
+      } else {
+        router.push("/");
+      }
+    }
+  }, [redirecting, isAuthenticated, user, router]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+    setRedirecting(false);
     
     try {
       const res = await fetch("/api/auth/login", {
@@ -27,17 +39,15 @@ export default function LoginPage() {
       
       if (!res.ok) {
         setError(data.error || "Email ou mot de passe incorrect");
+        setLoading(false);
         return;
       }
       
       // Utiliser le hook d'auth pour mettre à jour l'état global
       login(data.user);
-      
-      if (data.user.role === "admin") {
-        router.push("/admin/orders");
-      } else {
-        router.push("/");
-      }
+      // Recharger le contexte d'authentification depuis le cookie
+      await checkAuth();
+      setRedirecting(true);
     } catch (err) {
       setError("Erreur serveur. Réessayez plus tard.");
     } finally {
