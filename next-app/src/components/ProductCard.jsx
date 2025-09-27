@@ -74,7 +74,7 @@ export default function ProductCard({ product, sectionKey }) {
         </div>
       </div>
   {/* Nom du produit */}
-  <h3 className={`font-display text-2xl font-bold text-center mb-1${['Vermicelle', 'Couscous', 'Thiéb Blanc'].includes(product.name) ? ' text-black' : ' text-ink'}`}>{product.name}</h3>
+  <h3 className="font-display text-2xl font-bold text-center mb-1 text-black">{product.name}</h3>
       {/* Description concise */}
       {product.shortDescription && (
         <p className="text-slate-700 text-base text-center mb-2 font-body leading-relaxed px-4">{product.shortDescription}</p>
