@@ -96,23 +96,30 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       console.log('🚪 Déconnexion...');
-      
       await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include',
       });
 
+      // Reset le panier à la déconnexion
+      if (typeof window !== 'undefined') {
+        const { cart } = require('../utils/cart');
+        cart.clear();
+      }
+
       setUser(null);
       setIsAuthenticated(false);
       console.log('✅ Déconnexion réussie');
-      
-      // Rediriger vers la page d'accueil
       if (typeof window !== 'undefined') {
         window.location.href = '/';
       }
     } catch (error) {
       console.error('Erreur déconnexion:', error);
       // Forcer la déconnexion côté client même en cas d'erreur
+      if (typeof window !== 'undefined') {
+        const { cart } = require('../utils/cart');
+        cart.clear();
+      }
       setUser(null);
       setIsAuthenticated(false);
     }

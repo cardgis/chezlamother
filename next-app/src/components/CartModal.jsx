@@ -14,7 +14,25 @@ const CartModal = ({ isOpen, onClose }) => {
     setCartItems(cart.getItems());
     const update = items => setCartItems([...items]);
     cart.addListener(update);
-    return () => cart.removeListener(update);
+
+    // Timer pour reset le panier après 15 minutes d'inactivité
+    let inactivityTimer;
+    const resetTimer = () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        cart.clear();
+      }, 15 * 60 * 1000); // 15 minutes
+    };
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    resetTimer();
+
+    return () => {
+      cart.removeListener(update);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+    };
   }, []);
 
   const handleUpdateQuantity = (id, quantity) => {
