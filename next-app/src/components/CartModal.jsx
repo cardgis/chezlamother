@@ -102,15 +102,21 @@ const CartModal = ({ isOpen, onClose }) => {
     >
       <div className="flex items-center justify-center h-full">
         <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
-          <h2 className="text-2xl font-bold mb-4">Mon panier</h2>
+          <h2 className="text-2xl font-bold mb-4 text-black">Mon panier</h2>
           {cartItems.length === 0 ? (
             <div className="text-center py-6">
-              <p className="text-gray-500">Votre panier est vide.</p>
+              <p className="text-black">Votre panier est vide.</p>
               <button
                 onClick={onClose}
                 className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
               >
                 Continuer mes achats
+              </button>
+              <button
+                onClick={() => { window.location.href = '/'; }}
+                className="mt-2 px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-all"
+              >
+                Retour à l'accueil
               </button>
             </div>
           ) : (
@@ -128,15 +134,15 @@ const CartModal = ({ isOpen, onClose }) => {
                     <div className="flex items-center">
                       <button
                         onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                        className="px-3 py-1 bg-gray-200 text-gray-700 rounded-l-md hover:bg-gray-300 transition-all"
+                        className="px-3 py-1 bg-gray-200 text-black rounded-l-md hover:bg-gray-300 transition-all"
                         disabled={item.quantity <= 1}
                       >
                         -
                       </button>
-                      <span className="px-4 py-2 border-t border-b text-lg font-semibold">{item.quantity}</span>
+                      <span className="px-4 py-2 border-t border-b text-lg font-semibold text-black">{item.quantity}</span>
                       <button
                         onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                        className="px-3 py-1 bg-gray-200 text-gray-700 rounded-r-md hover:bg-gray-300 transition-all"
+                        className="px-3 py-1 bg-gray-200 text-black rounded-r-md hover:bg-gray-300 transition-all"
                       >
                         +
                       </button>
@@ -150,8 +156,8 @@ const CartModal = ({ isOpen, onClose }) => {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between items-center py-4 border-t">
-                <div className="text-lg font-semibold">
+              <div className="flex flex-col gap-2 py-4 border-t">
+                <div className="text-lg font-semibold text-black">
                   Total : <span className="text-green-600">{formatPrice(cartItems.reduce((total, item) => total + (item.price * item.quantity), 0))}</span>
                 </div>
                 <button
@@ -159,6 +165,12 @@ const CartModal = ({ isOpen, onClose }) => {
                   onClick={handleFinalizeOrder}
                 >
                   Finaliser la commande
+                </button>
+                <button
+                  onClick={() => { window.location.href = '/'; }}
+                  className="w-full bg-gray-200 text-black py-3 rounded-lg hover:bg-gray-300 font-semibold"
+                >
+                  Retour à l'accueil
                 </button>
               </div>
             </>
