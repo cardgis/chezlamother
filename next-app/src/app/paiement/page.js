@@ -33,10 +33,10 @@ function PaymentPageContent() {
       const response = await fetch(`/api/orders/${orderId}`);
       const data = await response.json();
 
-      if (data.success) {
-        setOrder(data.order);
-      } else {
+      if (data.error) {
         setError(data.error || 'Commande non trouvée');
+      } else {
+        setOrder(data);
       }
     } catch (err) {
       setError('Erreur lors du chargement de la commande');
