@@ -146,7 +146,7 @@ export default function Home() {
           <h1 className="text-black text-2xl sm:text-3xl lg:text-4xl tracking-wider font-bold">
             <span className="border-b-4 border-green-800">À Propos</span> de Nous
           </h1>
-          <p className="text-gray-400 text-sm sm:text-base">
+          <p className="text-black text-sm sm:text-base">
             Chez la Mother, nous célébrons l'authenticité de la cuisine sénégalaise. 
             Nos plats sont préparés avec amour selon les recettes traditionnelles transmises de génération en génération.
           </p>
@@ -161,8 +161,8 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="flex flex-col items-center lg:items-start justify-start text-center lg:text-left">
-                  <p className="text-gray-900 font-bold text-sm sm:text-base">Ingrédients Frais</p>
-                  <p className="text-gray-400 text-xs sm:text-sm">
+                  <p className="text-black font-bold text-sm sm:text-base">Ingrédients Frais</p>
+                  <p className="text-black text-xs sm:text-sm">
                     Nous sélectionnons soigneusement nos ingrédients pour vous offrir la meilleure qualité.
                   </p>
                 </div>
@@ -178,8 +178,8 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="flex flex-col items-center lg:items-start justify-start text-center lg:text-left">
-                  <p className="text-gray-900 font-bold text-sm sm:text-base">Livraison Rapide</p>
-                  <p className="text-gray-400 text-xs sm:text-sm">
+                  <p className="text-black font-bold text-sm sm:text-base">Livraison Rapide</p>
+                  <p className="text-black text-xs sm:text-sm">
                     Commandez maintenant et recevez vos plats chauds en moins de 45 minutes.
                   </p>
                 </div>
