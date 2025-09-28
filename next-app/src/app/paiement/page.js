@@ -15,13 +15,26 @@ function PaymentPageContent() {
   const [showQRPayment, setShowQRPayment] = useState(false);
 
   useEffect(() => {
-    if (orderId) {
-      fetchOrder();
-    } else {
-      setError('ID de commande manquant');
-      setLoading(false);
-    }
-  }, [orderId]);
+    // Vérification d'authentification avant de charger la commande
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/verify', { credentials: 'include' });
+        if (!res.ok) {
+          router.push('/auth/login');
+          return;
+        }
+        if (orderId) {
+          fetchOrder();
+        } else {
+          setError('ID de commande manquant');
+          setLoading(false);
+        }
+      } catch {
+        router.push('/auth/login');
+      }
+    };
+    checkAuth();
+  }, [orderId, router]);
 
   useEffect(() => {
     // Vider le panier à l'arrivée sur la page paiement
@@ -122,7 +135,7 @@ function PaymentPageContent() {
                   <strong>Nom:</strong> {order.customerName}
                 </p>
                 <p className="text-sm text-gray-700">
-                  <strong>Téléphone:</strong> {order.customerPhone}
+                  <strong>Téléphone:</strong> {order.customerPhone || 'Non renseigné'}
                 </p>
                 {order.customerEmail && (
                   <p className="text-sm text-gray-700">
