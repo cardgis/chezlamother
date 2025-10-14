@@ -1,9 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 
 export default function OrderStatusPage() {
-  const { isAuthenticated, user: authUser } = useAuth();
   const [orderId, setOrderId] = useState('');
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
