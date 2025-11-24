@@ -61,9 +61,9 @@ export default function ProductCard({ product, sectionKey }) {
       {unavailable && (
         <span className="badge right-4 top-4 absolute z-10 text-red-500 font-bold">Indisponible</span>
       )}
-      {/* Image ronde premium, taille 400x400px */}
+      {/* Image carrée premium, taille 160x160px */}
       <div className="flex justify-center items-center mt-6 mb-2">
-        <div className="w-40 h-40 rounded-full overflow-hidden ring-2 ring-saffron/40 shadow-soft bg-cream flex items-center justify-center">
+        <div className="w-40 h-40 rounded-xl overflow-hidden shadow-soft bg-cream flex items-center justify-center">
           <ImageWithFallback
             src={product.image || '/images/default-product.jpg'}
             alt={product.name}
