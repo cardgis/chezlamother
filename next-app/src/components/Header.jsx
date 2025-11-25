@@ -96,10 +96,15 @@ const Header = () => {
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-black focus:outline-none text-3xl"
+            className="text-black focus:outline-none text-3xl relative"
             aria-label="Ouvrir le menu"
           >
             ☰
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-green-800 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                {cartCount}
+              </span>
+            )}
           </button>
         </div>
       </header>
