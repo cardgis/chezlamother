@@ -146,6 +146,43 @@ export default function Home() {
           </div>
   </div>
       </div>
+      
+      {/* Features Section */}
+      <div className="bg-white py-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Ingrédients Frais */}
+            <div className="text-center">
+              <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v18m0-18l3 3m-3-3l-3 3" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12h18m-18 0l3-3m-3 3l3 3m12-6l3 3m-3-3l-3 3" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Ingrédients Frais</h3>
+              <p className="text-gray-600">
+                Nous sélectionnons soigneusement nos ingrédients pour vous offrir la meilleure qualité.
+              </p>
+            </div>
+
+            {/* Livraison Rapide */}
+            <div className="text-center">
+              <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v20m0-20l3 3m-3-3l-3 3m3 14l3 3m-3-3l-3 3" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Livraison Rapide</h3>
+              <p className="text-gray-600">
+                Commandez maintenant et recevez vos plats chauds en moins de 45 minutes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Location Map Section */}
       {showMap && userLocation && (
         <div id="location-map" className="w-full max-w-4xl mx-auto mt-8 px-4">
