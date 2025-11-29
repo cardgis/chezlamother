@@ -166,6 +166,19 @@ export default function WaveQRPayment({ order, onPaymentSuccess, onClose }) {
           </p>
         </div>
 
+        {/* Bouton Lien Direct Wave - Affiché en continu */}
+        <div className="text-center mb-6">
+          <button
+            onClick={() => window.open(waveURL, '_blank')}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all text-lg font-medium shadow-lg transform hover:scale-105"
+          >
+            🔗 Ouvrir Wave (lien direct)
+          </button>
+          <p className="text-sm text-gray-600 mt-2">
+            Ou scannez le QR code ci-dessous
+          </p>
+        </div>
+
         {/* QR Code */}
         <div className="text-center mb-6">
           <div className="bg-white p-4 rounded-lg border-2 border-gray-200 inline-block">
@@ -218,13 +231,6 @@ export default function WaveQRPayment({ order, onPaymentSuccess, onClose }) {
             className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             {paymentStatus === 'checking' ? 'Vérification...' : 'Vérifier le paiement'}
-          </button>
-          
-          <button
-            onClick={() => window.open(waveURL, '_blank')}
-            className="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition-colors"
-          >
-            Ouvrir Wave (lien direct)
           </button>
           
           {/* Bouton admin pour confirmation manuelle */}
