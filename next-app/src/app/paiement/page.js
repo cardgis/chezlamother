@@ -10,6 +10,8 @@ function PaymentPageContent() {
   // Récupérer l'orderId depuis sessionStorage pour plus de sécurité
   const orderId = typeof window !== 'undefined' ? sessionStorage.getItem('pendingOrderId') : null;
   
+  console.log('💳 Payment page loaded, orderId from sessionStorage:', orderId);
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,14 +21,23 @@ function PaymentPageContent() {
     // Vérification d'authentification avant de charger la commande
     const checkAuth = async () => {
       try {
+        console.log('🔐 Checking authentication...');
         const res = await fetch('/api/auth/verify', { credentials: 'include' });
+        console.log('🔐 Auth check response:', res.status);
+        
         if (!res.ok) {
+          console.log('❌ Auth failed, redirecting to login');
           router.push('/auth/login');
           return;
         }
+        
+        console.log('✅ Auth successful');
+        
         if (orderId) {
+          console.log('📦 Fetching order:', orderId);
           fetchOrder();
         } else {
+          console.log('❌ No orderId in sessionStorage');
           setError('Aucune commande en attente de paiement');
           setLoading(false);
           // Rediriger vers l'accueil après un délai
@@ -34,7 +45,8 @@ function PaymentPageContent() {
             router.push('/');
           }, 3000);
         }
-      } catch {
+      } catch (error) {
+        console.log('❌ Auth check error:', error);
         router.push('/auth/login');
       }
     };
@@ -48,19 +60,27 @@ function PaymentPageContent() {
 
   const fetchOrder = async () => {
     try {
+      console.log('📡 Fetching order details for ID:', orderId);
       const response = await fetch(`/api/orders/${orderId}`);
+      console.log('📡 Order fetch response:', response.status);
+      
       const data = await response.json();
+      console.log('📦 Order data received:', data);
 
       if (data.error) {
+        console.log('❌ Order fetch error:', data.error);
         setError(data.error || 'Commande non trouvée');
       } else {
+        console.log('✅ Order loaded successfully');
         setOrder(data);
         // Supprimer l'orderId de sessionStorage pour des raisons de sécurité
         if (typeof window !== 'undefined') {
           sessionStorage.removeItem('pendingOrderId');
+          console.log('🗑️ Removed orderId from sessionStorage');
         }
       }
     } catch (err) {
+      console.log('❌ Order fetch exception:', err);
       setError('Erreur lors du chargement de la commande');
       console.error('Erreur:', err);
     } finally {

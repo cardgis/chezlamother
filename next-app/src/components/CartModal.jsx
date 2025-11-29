@@ -44,12 +44,18 @@ const CartModal = ({ isOpen, onClose }) => {
   };
 
   const handleFinalizeOrder = async () => {
+    console.log('🛒 Finalizing order...');
+    console.log('Auth state:', { isAuthenticated, authUser });
+    
     // Vérifier d'abord si l'utilisateur est authentifié
     if (!isAuthenticated || !authUser) {
+      console.log('❌ User not authenticated, redirecting to login');
       // Rediriger immédiatement vers la page de connexion
       window.location.href = '/auth/login';
       return;
     }
+
+    console.log('✅ User authenticated:', authUser);
 
     const orderId = 'CMD' + Date.now();
     const clientName = authUser.name;
@@ -68,16 +74,24 @@ const CartModal = ({ isOpen, onClose }) => {
         unitPrice: item.price
       }))
     };
+
+    console.log('📦 Order data:', newOrder);
+
     const res = await fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newOrder)
     });
+
+    console.log('📡 Order creation response:', res.status);
+
     if (res.ok) {
       const createdOrder = await res.json();
+      console.log('✅ Order created:', createdOrder);
       cart.clear();
       // Stocker l'ID de commande dans sessionStorage pour plus de sécurité
       sessionStorage.setItem('pendingOrderId', createdOrder.id);
+      console.log('💾 SessionStorage set:', createdOrder.id);
       window.location.href = '/paiement';
     } else {
       let errorMsg = "Erreur lors de l'enregistrement de la commande. Veuillez réessayer ou contacter le restaurant.";
@@ -85,6 +99,7 @@ const CartModal = ({ isOpen, onClose }) => {
         const err = await res.json();
         if (err && err.error) errorMsg += "\n" + err.error;
       } catch {}
+      console.log('❌ Order creation failed:', errorMsg);
       setOrderError(errorMsg);
     }
   };
