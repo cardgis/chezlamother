@@ -9,9 +9,13 @@ import { fetchProductsData, productSections, formatPrice } from '../utils/produc
 const LeafletMapChezLaMother = dynamic(() => import('../components/LeafletMapChezLaMother'), { ssr: false });
 
 export default function Home() {
+  const [searchLocation, setSearchLocation] = useState('');
   const [userLocation, setUserLocation] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [distance, setDistance] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let intervalId;
