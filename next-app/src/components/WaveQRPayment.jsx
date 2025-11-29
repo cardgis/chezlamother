@@ -4,7 +4,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 
 export default function WaveQRPayment({ order, onPaymentSuccess, onClose }) {
   const [paymentStatus, setPaymentStatus] = useState('pending'); // 'pending', 'checking', 'confirmed'
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes en secondes
+  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes en secondes
   const [checkingInterval, setCheckingInterval] = useState(null);
 
   // QR Code Wave - URL ou données à configurer selon votre QR Wave

@@ -245,6 +245,13 @@ function PaymentPageContent() {
                   📱 Payer avec QR Code Wave
                 </button>
                 
+                <button
+                  onClick={() => window.open('https://pay.wave.com/m/M_sn_kaBpQqVj8vG-/c/sn/', '_blank')}
+                  className="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-all text-lg font-medium shadow-lg transform hover:scale-105"
+                >
+                  🔗 Payer directement avec Wave
+                </button>
+                
                 <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
                   <div className="flex items-center">
                     <svg className="w-4 h-4 mr-1 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
@@ -263,12 +270,26 @@ function PaymentPageContent() {
               
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                 <h4 className="font-semibold text-gray-800 mb-2">📋 Instructions rapides :</h4>
-                <ol className="text-sm text-gray-700 text-left space-y-1">
-                  <li>1. 📱 Ouvrez votre application Wave</li>
-                  <li>2. 📷 Cliquez sur "Scanner" ou "QR Code"</li>
-                  <li>3. 🎯 Pointez votre caméra vers le QR code</li>
-                  <li>4. ✅ Confirmez le paiement de {formatPrice(order?.totalAmount || 0)}</li>
-                </ol>
+                <div className="space-y-3">
+                  <div>
+                    <h5 className="font-medium text-gray-700 mb-1">Pour le paiement par QR Code :</h5>
+                    <ol className="text-sm text-gray-700 text-left space-y-1 ml-4">
+                      <li>1. 📱 Cliquez sur "Payer avec QR Code Wave"</li>
+                      <li>2. 📱 Ouvrez votre application Wave</li>
+                      <li>3. 📷 Cliquez sur "Scanner" ou "QR Code"</li>
+                      <li>4. 🎯 Pointez votre caméra vers le QR code</li>
+                      <li>5. ✅ Confirmez le paiement de {formatPrice(order?.totalAmount || 0)}</li>
+                    </ol>
+                  </div>
+                  <div>
+                    <h5 className="font-medium text-gray-700 mb-1">Pour le paiement direct :</h5>
+                    <ol className="text-sm text-gray-700 text-left space-y-1 ml-4">
+                      <li>1. 🔗 Cliquez sur "Payer directement avec Wave"</li>
+                      <li>2. 📱 Votre application Wave s'ouvrira automatiquement</li>
+                      <li>3. ✅ Confirmez le paiement de {formatPrice(order?.totalAmount || 0)}</li>
+                    </ol>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
