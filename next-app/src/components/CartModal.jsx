@@ -63,6 +63,7 @@ const CartModal = ({ isOpen, onClose }) => {
     const clientName = user.name;
     const totalAmount = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const newOrder = {
+      userId: user.id,
       customerName: clientName,
       customerEmail: user.email || null,
       customerPhone: user.phone || null,
