@@ -41,7 +41,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <form className="bg-white p-8 rounded shadow w-full max-w-sm" onSubmit={handleRegister}>
-        <h2 className="text-2xl font-bold mb-6 text-center">Inscription</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-black">Inscription</h2>
         {error && <div className="text-red-600 mb-4 text-center">{error}</div>}
         <input type="text" placeholder="Nom" className="w-full mb-4 p-2 border rounded text-black" value={name} onChange={e => setName(e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))} required />
         <input type="email" placeholder="Email" className="w-full mb-4 p-2 border rounded text-black" value={email} onChange={e => setEmail(e.target.value)} required />

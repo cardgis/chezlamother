@@ -59,7 +59,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <form className="bg-white p-8 rounded shadow w-full max-w-sm" onSubmit={handleLogin}>
-        <h2 className="text-2xl font-bold mb-6 text-center">Connexion</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-black">Connexion</h2>
         {error && <div className="text-red-600 mb-4 text-center">{error}</div>}
         <input type="email" placeholder="Email" className="w-full mb-4 p-2 border rounded text-black" value={email} onChange={e => setEmail(e.target.value)} required />
         <div className="relative mb-6">
