@@ -74,10 +74,10 @@ export default function ProductCard({ product, sectionKey }) {
         </div>
       </div>
   {/* Nom du produit */}
-  <h3 className={`font-display text-2xl font-bold text-center mb-1 text-black${unavailable ? ' opacity-60' : ''}`}>{product.name}</h3>
+  <h3 className="font-display text-2xl font-bold text-center mb-1 text-black">{product.name}</h3>
       {/* Description concise */}
       {product.shortDescription && (
-        <p className={`text-slate-700 text-base text-center mb-2 font-body leading-relaxed px-4${unavailable ? ' opacity-60' : ''}`}>{product.shortDescription}</p>
+        <p className={`text-black text-base text-center mb-2 font-body leading-relaxed px-4${unavailable ? '' : ''}`}>{product.shortDescription}</p>
       )}
       {/* Prix chip améliorée */}
       {product.price && (
