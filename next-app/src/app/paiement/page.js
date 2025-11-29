@@ -16,6 +16,7 @@ function PaymentPageContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showQRPayment, setShowQRPayment] = useState(false);
+  const [orderLoaded, setOrderLoaded] = useState(false); // État pour éviter les re-renders
 
   useEffect(() => {
     // Vérification d'authentification avant de charger la commande
@@ -33,10 +34,10 @@ function PaymentPageContent() {
         
         console.log('✅ Auth successful');
         
-        if (orderId) {
+        if (orderId && !orderLoaded) {
           console.log('📦 Fetching order:', orderId);
           fetchOrder();
-        } else {
+        } else if (!orderId && !orderLoaded) {
           console.log('❌ No orderId in sessionStorage');
           setError('Aucune commande en attente de paiement');
           setLoading(false);
@@ -50,13 +51,25 @@ function PaymentPageContent() {
         router.push('/auth/login');
       }
     };
-    checkAuth();
-  }, [orderId, router]);
+    
+    if (!orderLoaded) {
+      checkAuth();
+    }
+  }, [orderId, router, orderLoaded]);
 
   useEffect(() => {
-    // NE PLUS vider le panier automatiquement à l'arrivée sur la page paiement
-    // Le panier sera vidé seulement après confirmation du paiement
-  }, []);
+    // Nettoyer le sessionStorage si l'utilisateur quitte la page sans payer
+    const handleBeforeUnload = () => {
+      if (typeof window !== 'undefined' && !orderLoaded) {
+        sessionStorage.removeItem('pendingOrderId');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [orderLoaded]);
 
   const fetchOrder = async () => {
     try {
@@ -73,11 +86,9 @@ function PaymentPageContent() {
       } else {
         console.log('✅ Order loaded successfully');
         setOrder(data);
-        // Supprimer l'orderId de sessionStorage pour des raisons de sécurité
-        if (typeof window !== 'undefined') {
-          sessionStorage.removeItem('pendingOrderId');
-          console.log('🗑️ Removed orderId from sessionStorage');
-        }
+        setOrderLoaded(true);
+        // NE PAS supprimer l'orderId immédiatement pour éviter les re-renders
+        // Il sera supprimé seulement après paiement réussi
       }
     } catch (err) {
       console.log('❌ Order fetch exception:', err);
@@ -91,6 +102,10 @@ function PaymentPageContent() {
   const handlePaymentSuccess = (payment) => {
     // Vider le panier seulement après un paiement réussi
     cart.clear();
+    // Supprimer l'orderId de sessionStorage après paiement réussi
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('pendingOrderId');
+    }
     // Rediriger vers la page de confirmation
     router.push(`/order-status?id=${order.id}&status=success`);
   };
