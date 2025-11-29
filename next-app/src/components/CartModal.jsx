@@ -44,30 +44,22 @@ const CartModal = ({ isOpen, onClose }) => {
   };
 
   const handleFinalizeOrder = async () => {
-    let user = null;
-    if (isAuthenticated && authUser) {
-      user = authUser;
-    } else if (typeof window !== 'undefined') {
-      const userStr = localStorage.getItem('currentUser');
-      if (userStr) {
-        try {
-          user = JSON.parse(userStr);
-        } catch {}
-      }
-    }
-    if (!user) {
+    // Vérifier d'abord si l'utilisateur est authentifié
+    if (!isAuthenticated || !authUser) {
+      // Rediriger immédiatement vers la page de connexion
       window.location.href = '/auth/login';
       return;
     }
+
     const orderId = 'CMD' + Date.now();
-    const clientName = user.name;
+    const clientName = authUser.name;
     const totalAmount = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const newOrder = {
-      userId: user.id,
+      userId: authUser.id,
       customerName: clientName,
-      customerEmail: user.email || null,
-      customerPhone: user.phone || null,
-      deliveryAddress: user.address || null,
+      customerEmail: authUser.email || null,
+      customerPhone: authUser.phone || null,
+      deliveryAddress: authUser.address || null,
       totalAmount: totalAmount,
       status: 'pending',
       items: cartItems.map(item => ({
