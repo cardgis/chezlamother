@@ -42,8 +42,8 @@ function PaymentPageContent() {
   }, [orderId, router]);
 
   useEffect(() => {
-    // Vider le panier à l'arrivée sur la page paiement
-    cart.clear();
+    // NE PLUS vider le panier automatiquement à l'arrivée sur la page paiement
+    // Le panier sera vidé seulement après confirmation du paiement
   }, []);
 
   const fetchOrder = async () => {
@@ -69,6 +69,8 @@ function PaymentPageContent() {
   };
 
   const handlePaymentSuccess = (payment) => {
+    // Vider le panier seulement après un paiement réussi
+    cart.clear();
     // Rediriger vers la page de confirmation
     router.push(`/order-status?id=${order.id}&status=success`);
   };
