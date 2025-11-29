@@ -9,10 +9,9 @@ import { fetchProductsData, productSections, formatPrice } from '../utils/produc
 const LeafletMapChezLaMother = dynamic(() => import('../components/LeafletMapChezLaMother'), { ssr: false });
 
 export default function Home() {
-  const [searchLocation, setSearchLocation] = useState('');
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [showMap, setShowMap] = useState(false);
+  const [distance, setDistance] = useState(null);
 
   useEffect(() => {
     let intervalId;
@@ -53,7 +52,46 @@ export default function Home() {
   };
 
   const handleLocationSearch = () => {
-    alert(`Recherche de livraison pour: ${searchLocation || 'Votre localisation'}`);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+          setUserLocation({ lat: userLat, lng: userLng });
+
+          // Calculer la distance avec le restaurant
+          const restaurantLat = 14.7731787;
+          const restaurantLng = -16.9359667;
+          const calculatedDistance = calculateDistance(userLat, userLng, restaurantLat, restaurantLng);
+          setDistance(calculatedDistance);
+
+          // Afficher la carte
+          setShowMap(true);
+
+          // Scroll vers la carte
+          setTimeout(() => {
+            document.getElementById('location-map')?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        },
+        (error) => {
+          console.error('Erreur de géolocalisation:', error);
+          alert('Impossible d\'accéder à votre localisation. Veuillez autoriser l\'accès à la localisation dans votre navigateur.');
+        }
+      );
+    } else {
+      alert('La géolocalisation n\'est pas supportée par votre navigateur.');
+    }
+  };
+
+  const calculateDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 6371; // Rayon de la Terre en km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
   };
 
   return (
@@ -104,6 +142,35 @@ export default function Home() {
           </div>
   </div>
       </div>
+      {/* Location Map Section */}
+      {showMap && userLocation && (
+        <div id="location-map" className="w-full max-w-4xl mx-auto mt-8 px-4">
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-center text-black mb-4">
+              Votre position par rapport au restaurant
+            </h3>
+            <div className="w-full h-64 rounded-lg overflow-hidden shadow-lg mb-4">
+              <LeafletMapChezLaMother latitude={14.7731787} longitude={-16.9359667} userLocation={userLocation} />
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-gray-700">
+                Distance : <span className="font-bold text-black">{distance?.toFixed(1)} km</span>
+              </p>
+              {distance <= 3 ? (
+                <div className="bg-green-100 border border-green-300 rounded-lg p-3">
+                  <p className="text-green-800 font-semibold">✅ Livraison disponible !</p>
+                  <p className="text-green-700 text-sm">Livraison gratuite pour les commandes de 5000F CFA et plus.</p>
+                </div>
+              ) : (
+                <div className="bg-orange-100 border border-orange-300 rounded-lg p-3">
+                  <p className="text-orange-800 font-semibold">⚠️ Hors zone de livraison</p>
+                  <p className="text-orange-700 text-sm">La livraison n'est disponible que dans un rayon de 3km.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {/* Menu Section */}
       <div className="space-y-8 sm:space-y-12 mt-8" id="menu">
         <div className="text-center space-y-3 sm:space-y-4 px-4">

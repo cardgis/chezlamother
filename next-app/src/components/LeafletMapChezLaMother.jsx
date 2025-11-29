@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { useEffect, useState } from 'react';
 import L from 'leaflet';
 
-export default function LeafletMapChezLaMother({ latitude, longitude }) {
+export default function LeafletMapChezLaMother({ latitude, longitude, userLocation }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -19,11 +19,17 @@ export default function LeafletMapChezLaMother({ latitude, longitude }) {
   }) : undefined;
   if (!mounted) return null;
   return (
-    <MapContainer center={position} zoom={17} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+    <MapContainer 
+      center={userLocation ? [(userLocation.lat + latitude) / 2, (userLocation.lng + longitude) / 2] : position} 
+      zoom={userLocation ? 12 : 17} 
+      scrollWheelZoom={true} 
+      style={{ height: '100%', width: '100%' }}
+    >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
       />
+      {/* Marker du restaurant */}
       <Marker position={position} icon={markerIcon}>
         <Popup minWidth={120} maxWidth={160}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2px 0' }}>
@@ -33,6 +39,16 @@ export default function LeafletMapChezLaMother({ latitude, longitude }) {
           </div>
         </Popup>
       </Marker>
+      {/* Marker de l'utilisateur */}
+      {userLocation && (
+        <Marker position={[userLocation.lat, userLocation.lng]}>
+          <Popup>
+            <div style={{ textAlign: 'center' }}>
+              <span style={{ fontWeight: 'bold', color: '#007bff' }}>📍 Votre position</span>
+            </div>
+          </Popup>
+        </Marker>
+      )}
     </MapContainer>
   );
 }
