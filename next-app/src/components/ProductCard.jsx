@@ -49,7 +49,7 @@ export default function ProductCard({ product, sectionKey }) {
   // ...existing code...
   const unavailable = (sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && !isGloballyAvailable);
   return (
-    <div className={`bg-white rounded-xl2 shadow-soft hover:shadow-lift transition-transform duration-200 hover:-translate-y-1 overflow-hidden relative${unavailable ? ' opacity-80' : ''}`}>
+    <div className={`bg-white rounded-xl2 shadow-soft hover:shadow-lift transition-transform duration-200 hover:-translate-y-1 overflow-hidden relative${unavailable ? ' opacity-60' : ''}`}>
       {/* Badge jour ou indisponible */}
       {/* Badge jour ou "Tous les jours" pour Yassa */}
       {shouldShowDayTag && product.dayAvailable === 'tous_les_jours' && (
@@ -63,7 +63,7 @@ export default function ProductCard({ product, sectionKey }) {
       )}
       {/* Image carrée premium, taille 160x160px */}
       <div className="flex justify-center items-center mt-6 mb-2">
-        <div className="w-40 h-40 rounded-xl overflow-hidden shadow-soft bg-cream flex items-center justify-center">
+        <div className={`w-40 h-40 rounded-xl overflow-hidden shadow-soft bg-cream flex items-center justify-center${unavailable ? ' opacity-100' : ''}`}>
           <ImageWithFallback
             src={product.image || '/images/default-product.jpg'}
             alt={product.name}
