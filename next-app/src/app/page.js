@@ -106,7 +106,7 @@ export default function Home() {
         <div className="w-full lg:w-2/3 flex flex-col justify-start items-start space-y-4 sm:space-y-6 lg:space-y-8">
           <div className="flex flex-col sm:flex-row justify-start items-start w-full">
             <div className="bg-gray-900 text-white py-1 px-2 sm:px-4 text-sm sm:text-base">Livraison</div>
-            <div className="bg-gray-200 text-gray-900 py-1 px-2 sm:px-4 text-sm sm:text-base mt-1 sm:mt-0">gratuite dès 5000F Rayon 3km</div>
+            <div className="bg-gray-200 text-gray-900 py-1 px-2 sm:px-4 text-sm sm:text-base mt-1 sm:mt-0">gratuite dès 5000F Rayon 5km</div>
           </div>
           <div className="flex justify-start items-start w-full">
               <h1 className="text-black text-2xl sm:text-4xl lg:text-6xl tracking-wider font-bold leading-tight">
@@ -160,7 +160,7 @@ export default function Home() {
               <p className="text-gray-700">
                 Distance : <span className="font-bold text-black">{distance?.toFixed(1)} km</span>
               </p>
-              {distance <= 3 ? (
+              {distance <= 5 ? (
                 <div className="bg-green-100 border border-green-300 rounded-lg p-3">
                   <p className="text-green-800 font-semibold">✅ Livraison disponible !</p>
                   <p className="text-green-700 text-sm">Livraison gratuite pour les commandes de 5000F CFA et plus.</p>
@@ -168,7 +168,7 @@ export default function Home() {
               ) : (
                 <div className="bg-orange-100 border border-orange-300 rounded-lg p-3">
                   <p className="text-orange-800 font-semibold">⚠️ Hors zone de livraison</p>
-                  <p className="text-orange-700 text-sm">La livraison n'est disponible que dans un rayon de 3km.</p>
+                  <p className="text-orange-700 text-sm">La livraison n'est disponible que dans un rayon de 5km.</p>
                 </div>
               )}
             </div>
