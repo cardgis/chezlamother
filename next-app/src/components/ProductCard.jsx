@@ -63,7 +63,7 @@ export default function ProductCard({ product, sectionKey }) {
       )}
       {/* Image carrée premium, taille 160x160px */}
       <div className="flex justify-center items-center mt-6 mb-2">
-        <div className={`w-40 h-40 rounded-xl overflow-hidden shadow-soft bg-cream flex items-center justify-center${unavailable ? ' opacity-100' : ''}`}>
+        <div className="w-40 h-40 rounded-xl overflow-hidden shadow-soft bg-cream flex items-center justify-center opacity-100">
           <ImageWithFallback
             src={product.image || '/images/default-product.jpg'}
             alt={product.name}
