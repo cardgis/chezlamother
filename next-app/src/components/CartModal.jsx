@@ -83,7 +83,9 @@ const CartModal = ({ isOpen, onClose }) => {
     if (res.ok) {
       const createdOrder = await res.json();
       cart.clear();
-      window.location.href = `/paiement?orderId=${createdOrder.id}`;
+      // Stocker l'ID de commande dans sessionStorage pour plus de sécurité
+      sessionStorage.setItem('pendingOrderId', createdOrder.id);
+      window.location.href = '/paiement';
     } else {
       let errorMsg = "Erreur lors de l'enregistrement de la commande. Veuillez réessayer ou contacter le restaurant.";
       try {

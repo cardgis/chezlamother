@@ -7,7 +7,8 @@ import { cart } from '../../utils/cart';
 function PaymentPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const orderId = searchParams.get('orderId');
+  // Récupérer l'orderId depuis sessionStorage pour plus de sécurité
+  const orderId = typeof window !== 'undefined' ? sessionStorage.getItem('pendingOrderId') : null;
   
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,8 +27,12 @@ function PaymentPageContent() {
         if (orderId) {
           fetchOrder();
         } else {
-          setError('ID de commande manquant');
+          setError('Aucune commande en attente de paiement');
           setLoading(false);
+          // Rediriger vers l'accueil après un délai
+          setTimeout(() => {
+            router.push('/');
+          }, 3000);
         }
       } catch {
         router.push('/auth/login');
@@ -50,6 +55,10 @@ function PaymentPageContent() {
         setError(data.error || 'Commande non trouvée');
       } else {
         setOrder(data);
+        // Supprimer l'orderId de sessionStorage pour des raisons de sécurité
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('pendingOrderId');
+        }
       }
     } catch (err) {
       setError('Erreur lors du chargement de la commande');
