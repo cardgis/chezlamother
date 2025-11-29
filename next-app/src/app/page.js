@@ -121,7 +121,7 @@ export default function Home() {
           <div className="flex justify-start items-start w-full">
             <div className="drop-shadow-2xl rounded-full flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 bg-white p-2 sm:py-2 sm:px-4 w-full sm:w-auto">
               <input
-                className="focus:outline-none focus:ring-0 px-3 py-2 text-sm sm:text-base flex-1 min-w-0"
+                className="focus:outline-none focus:ring-0 px-3 py-2 text-sm sm:text-base flex-1 min-w-0 placeholder-black"
                 placeholder="Votre adresse de livraison"
                 value={searchLocation}
                 onChange={(e) => setSearchLocation(e.target.value)}
