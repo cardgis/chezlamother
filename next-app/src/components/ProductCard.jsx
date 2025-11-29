@@ -49,7 +49,7 @@ export default function ProductCard({ product, sectionKey }) {
   // ...existing code...
   const unavailable = (sectionKey === 'plats_midi' && !(isAvailableToday || product.dayAvailable === 'tous_les_jours')) || (sectionKey !== 'plats_midi' && !isGloballyAvailable);
   return (
-    <div className={`bg-white rounded-xl2 shadow-soft hover:shadow-lift transition-transform duration-200 hover:-translate-y-1 overflow-hidden relative${unavailable ? ' opacity-60' : ''}`}>
+    <div className="bg-white rounded-xl2 shadow-soft hover:shadow-lift transition-transform duration-200 hover:-translate-y-1 overflow-hidden relative">
       {/* Badge jour ou indisponible */}
       {/* Badge jour ou "Tous les jours" pour Yassa */}
       {shouldShowDayTag && product.dayAvailable === 'tous_les_jours' && (
@@ -63,7 +63,7 @@ export default function ProductCard({ product, sectionKey }) {
       )}
       {/* Image carrée premium, taille 160x160px */}
       <div className="flex justify-center items-center mt-6 mb-2">
-        <div className="w-40 h-40 rounded-xl overflow-hidden shadow-soft bg-cream flex items-center justify-center opacity-100">
+        <div className="w-40 h-40 rounded-xl overflow-hidden shadow-soft bg-cream flex items-center justify-center">
           <ImageWithFallback
             src={product.image || '/images/default-product.jpg'}
             alt={product.name}
@@ -74,10 +74,10 @@ export default function ProductCard({ product, sectionKey }) {
         </div>
       </div>
   {/* Nom du produit */}
-  <h3 className="font-display text-2xl font-bold text-center mb-1 text-black">{product.name}</h3>
+  <h3 className={`font-display text-2xl font-bold text-center mb-1 text-black${unavailable ? ' opacity-60' : ''}`}>{product.name}</h3>
       {/* Description concise */}
       {product.shortDescription && (
-        <p className="text-slate-700 text-base text-center mb-2 font-body leading-relaxed px-4">{product.shortDescription}</p>
+        <p className={`text-slate-700 text-base text-center mb-2 font-body leading-relaxed px-4${unavailable ? ' opacity-60' : ''}`}>{product.shortDescription}</p>
       )}
       {/* Prix chip améliorée */}
       {product.price && (
@@ -86,7 +86,7 @@ export default function ProductCard({ product, sectionKey }) {
         </div>
       )}
       {/* Boutons actions */}
-      <div className="flex justify-center gap-2 mt-4 mb-6">
+      <div className={`flex justify-center gap-2 mt-4 mb-6${unavailable ? ' opacity-60' : ''}`}>
         <button
           onClick={handleDetails}
           disabled={unavailable}
