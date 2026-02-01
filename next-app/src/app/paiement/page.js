@@ -150,7 +150,7 @@ function PaymentPageContent() {
               Finaliser votre commande
             </h1>
             <p className="text-gray-600">
-              Commande #{order?.id} - {formatPrice(order?.totalAmount || 0)}
+              Commande #{order?.id} - {formatPrice((order?.totalAmount || 0) / 100)}
             </p>
           </div>
 
@@ -205,7 +205,7 @@ function PaymentPageContent() {
                 <div className="flex justify-between items-center">
                   <p className="text-lg font-bold text-gray-800">Total à payer:</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {formatPrice(order.totalAmount)}
+                    {formatPrice((order.totalAmount || 0) / 100)}
                   </p>
                 </div>
               </div>
@@ -263,7 +263,7 @@ function PaymentPageContent() {
                       <li>2. 📱 Ouvrez votre application Wave</li>
                       <li>3. 📷 Cliquez sur "Scanner" ou "QR Code"</li>
                       <li>4. 🎯 Pointez votre caméra vers le QR code</li>
-                      <li>5. ✅ Confirmez le paiement de {formatPrice(order?.totalAmount || 0)}</li>
+                      <li>5. ✅ Confirmez le paiement de {formatPrice((order?.totalAmount || 0) / 100)}</li>
                     </ol>
                   </div>
                   <div>
@@ -271,7 +271,7 @@ function PaymentPageContent() {
                     <ol className="text-sm text-gray-700 text-left space-y-1 ml-4">
                       <li>1. 🔗 Cliquez sur "Payer directement avec Wave"</li>
                       <li>2. 📱 Votre application Wave s'ouvrira automatiquement</li>
-                      <li>3. ✅ Confirmez le paiement de {formatPrice(order?.totalAmount || 0)}</li>
+                      <li>3. ✅ Confirmez le paiement de {formatPrice((order?.totalAmount || 0) / 100)}</li>
                     </ol>
                   </div>
                 </div>
