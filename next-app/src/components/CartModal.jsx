@@ -193,7 +193,7 @@ const CartModal = ({ isOpen, onClose }) => {
                         type="text"
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
                         placeholder="Votre nom"
                       />
                       {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
@@ -204,7 +204,7 @@ const CartModal = ({ isOpen, onClose }) => {
                         type="tel"
                         value={customerPhone}
                         onChange={(e) => setCustomerPhone(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
                         placeholder="77 123 45 67"
                       />
                       {formErrors.phone && <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>}

@@ -68,6 +68,14 @@ function PaymentPageContent() {
       if (data.error) {
         console.log('❌ Order fetch error:', data.error);
         setError(data.error || 'Commande non trouvée');
+        // Supprimer l'orderId de sessionStorage si la commande n'existe pas
+        if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('pendingOrderId');
+        }
+        // Rediriger immédiatement vers l'accueil
+        setTimeout(() => {
+          router.push('/');
+        }, 2000);
       } else {
         console.log('✅ Order loaded successfully');
         setOrder(data);
