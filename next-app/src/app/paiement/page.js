@@ -19,41 +19,26 @@ function PaymentPageContent() {
   const [orderLoaded, setOrderLoaded] = useState(false); // État pour éviter les re-renders
 
   useEffect(() => {
-    // Vérification d'authentification avant de charger la commande
-    const checkAuth = async () => {
-      try {
-        console.log('🔐 Checking authentication...');
-        const res = await fetch('/api/auth/verify', { credentials: 'include' });
-        console.log('🔐 Auth check response:', res.status);
-        
-        if (!res.ok) {
-          console.log('❌ Auth failed, redirecting to login');
-          router.push('/auth/login');
-          return;
-        }
-        
-        console.log('✅ Auth successful');
-        
-        if (orderId && !orderLoaded) {
-          console.log('📦 Fetching order:', orderId);
-          fetchOrder();
-        } else if (!orderId && !orderLoaded) {
-          console.log('❌ No orderId in sessionStorage');
-          setError('Aucune commande en attente de paiement');
-          setLoading(false);
-          // Rediriger vers l'accueil après un délai
-          setTimeout(() => {
-            router.push('/');
-          }, 3000);
-        }
-      } catch (error) {
-        console.log('❌ Auth check error:', error);
-        router.push('/auth/login');
+    // Charger la commande directement sans vérification d'authentification
+    const loadOrder = async () => {
+      console.log('💳 Payment page loaded, orderId from sessionStorage:', orderId);
+
+      if (orderId && !orderLoaded) {
+        console.log('📦 Fetching order:', orderId);
+        fetchOrder();
+      } else if (!orderId && !orderLoaded) {
+        console.log('❌ No orderId in sessionStorage');
+        setError('Aucune commande en attente de paiement');
+        setLoading(false);
+        // Rediriger vers l'accueil après un délai
+        setTimeout(() => {
+          router.push('/');
+        }, 3000);
       }
     };
-    
+
     if (!orderLoaded) {
-      checkAuth();
+      loadOrder();
     }
   }, [orderId, router, orderLoaded]);
 

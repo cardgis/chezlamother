@@ -1,14 +1,16 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import { cart } from '../utils/cart';
 import { formatPrice } from '../utils/products';
 
 const CartModal = ({ isOpen, onClose }) => {
-  const { isAuthenticated, user: authUser } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [orderPopup, setOrderPopup] = useState(null);
   const [orderError, setOrderError] = useState('');
+  const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     setCartItems(cart.getItems());
@@ -43,29 +45,30 @@ const CartModal = ({ isOpen, onClose }) => {
     cart.removeItem(id);
   };
 
-  const handleFinalizeOrder = async () => {
-    console.log('🛒 Finalizing order...');
-    console.log('Auth state:', { isAuthenticated, authUser });
+  const handleFinalizeOrder = () => {
+    setShowCustomerForm(true);
+  };
+
+  const handleSubmitOrder = async () => {
+    // Validation
+    const errors = {};
+    if (!customerName.trim()) errors.name = 'Le nom est requis';
+    if (!customerPhone.trim()) errors.phone = 'Le numéro de téléphone est requis';
+    else if (!/^\d{10}$/.test(customerPhone.replace(/\s/g, ''))) errors.phone = 'Numéro de téléphone invalide (10 chiffres requis)';
     
-    // Vérifier d'abord si l'utilisateur est authentifié
-    if (!isAuthenticated || !authUser) {
-      console.log('❌ User not authenticated, redirecting to login');
-      // Rediriger immédiatement vers la page de connexion
-      window.location.href = '/auth/login';
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
-    console.log('✅ User authenticated:', authUser);
+    setFormErrors({});
 
-    const orderId = 'CMD' + Date.now();
-    const clientName = authUser.name;
+    console.log('🛒 Submitting order...');
+
     const totalAmount = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const newOrder = {
-      userId: authUser.id,
-      customerName: clientName,
-      customerEmail: authUser.email || null,
-      customerPhone: authUser.phone || null,
-      deliveryAddress: authUser.address || null,
+      customerName: customerName.trim(),
+      customerPhone: customerPhone.replace(/\s/g, ''),
       totalAmount: totalAmount,
       status: 'pending',
       items: cartItems.map(item => ({
@@ -170,12 +173,59 @@ const CartModal = ({ isOpen, onClose }) => {
                 <div className="text-lg font-semibold text-black">
                   Total : <span className="text-green-600">{formatPrice(cartItems.reduce((total, item) => total + (item.price * item.quantity), 0))}</span>
                 </div>
-                <button
-                  className="w-full bg-green-800 text-white py-3 rounded-lg hover:bg-green-900 font-semibold"
-                  onClick={handleFinalizeOrder}
-                >
-                  Finaliser la commande
-                </button>
+                {showCustomerForm ? (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-black">Informations de livraison</h3>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Nom complet</label>
+                      <input
+                        type="text"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Votre nom"
+                      />
+                      {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-black mb-1">Numéro de téléphone</label>
+                      <input
+                        type="tel"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="06 12 34 56 78"
+                      />
+                      {formErrors.phone && <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>}
+                    </div>
+                    {orderError && <p className="text-red-500 text-sm">{orderError}</p>}
+                    <div className="flex gap-2">
+                      <button
+                        className="flex-1 bg-green-800 text-white py-3 rounded-lg hover:bg-green-900 font-semibold"
+                        onClick={handleSubmitOrder}
+                      >
+                        Confirmer la commande
+                      </button>
+                      <button
+                        className="flex-1 bg-gray-200 text-black py-3 rounded-lg hover:bg-gray-300 font-semibold"
+                        onClick={() => {
+                          setShowCustomerForm(false);
+                          setFormErrors({});
+                          setOrderError('');
+                        }}
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    className="w-full bg-green-800 text-white py-3 rounded-lg hover:bg-green-900 font-semibold"
+                    onClick={handleFinalizeOrder}
+                  >
+                    Finaliser la commande
+                  </button>
+                )}
                 <button
                   onClick={() => { window.location.href = '/'; }}
                   className="w-full bg-gray-200 text-black py-3 rounded-lg hover:bg-gray-300 font-semibold"
