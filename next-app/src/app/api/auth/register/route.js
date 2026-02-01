@@ -6,7 +6,7 @@ import { Pool } from 'pg';
 const NEON_DB_URL = 'postgres://default:UpPh5bCk6iSZ@ep-snowy-union-a4t26bx0-pooler.us-east-1.aws.neon.tech/verceldb?pgbouncer=true&connect_timeout=15&sslmode=require';
 
 const pool = new Pool({
-  connectionString: process.env.NODE_ENV === 'production' ? NEON_DB_URL : (process.env.DATABASE_URL || NEON_DB_URL),
+  connectionString: process.env.DATABASE_URL || NEON_DB_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 10,
   idleTimeoutMillis: 30000,
