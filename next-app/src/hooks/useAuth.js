@@ -19,10 +19,10 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Vérifier l'authentification au chargement
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  // Vérifier l'authentification au chargement - COMMENTÉ car pas nécessaire pour les utilisateurs
+  // useEffect(() => {
+  //   checkAuth();
+  // }, []);
 
   // Vérifier si l'utilisateur est authentifié
   const checkAuth = async () => {
