@@ -53,28 +53,24 @@ const Header = () => {
                 )}
               </button>
             </li>
-            {user ? (
+            {user && user.role === 'admin' && (
               <>
-                {user.role === 'admin' && (
-                  <li>
-                    <a 
-                      href="/admin/payments" 
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-                    >
-                      💳 Paiements
-                    </a>
-                  </li>
-                )}
-                {user.role === 'admin' && (
-                  <li>
-                    <a 
-                      href="/admin/orders" 
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                    >
-                      🍽️ Cuisine
-                    </a>
-                  </li>
-                )}
+                <li>
+                  <a 
+                    href="/admin/payments" 
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                  >
+                    💳 Paiements
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/admin/orders" 
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                  >
+                    🍽️ Cuisine
+                  </a>
+                </li>
                 <li>
                   <button
                     onClick={handleLogout}
@@ -84,10 +80,6 @@ const Header = () => {
                   </button>
                 </li>
               </>
-            ) : (
-              <li>
-                <a href="/auth/login" className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition-colors font-semibold">Connexion</a>
-              </li>
             )}
           </ul>
         </nav>
@@ -136,7 +128,7 @@ const Header = () => {
                 )}
               </button>
             </li>
-            {user ? (
+            {user && user.role === 'admin' && (
               <li>
                 <button
                   onClick={() => { handleLogout(); setIsMenuOpen(false); }}
@@ -145,30 +137,9 @@ const Header = () => {
                   Déconnexion
                 </button>
               </li>
-            ) : (
-              <li>
-                <a href="/auth/login" className="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition-colors font-semibold" onClick={() => setIsMenuOpen(false)}>Connexion</a>
-              </li>
             )}
           </ul>
         </nav>
-      )}
-      {user && (
-        <div className="flex justify-center items-center mt-2 mb-2">
-          <h2 className="text-2xl font-bold text-center animate-bounce text-black">
-            {`Bienvenue, `}
-            {(user.name || user.email || 'Utilisateur').split('').map((char, i) => (
-              <span
-                key={i}
-                className={`inline-block transition-all duration-300 ease-in-out px-1 rounded ${i % 2 === 0 ? 'text-green-700' : 'text-green-400'} hover:scale-125 hover:bg-green-100`}
-                style={{ animationDelay: `${i * 0.1}s` }}
-              >
-                {char}
-              </span>
-            ))}
-            <span className="ml-2 text-green-600 animate-pulse">!</span>
-          </h2>
-        </div>
       )}
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>

@@ -17,6 +17,14 @@ const CartModal = ({ isOpen, onClose }) => {
     const update = items => setCartItems([...items]);
     cart.addListener(update);
 
+    // Load user info from localStorage
+    const userInfo = typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
+    if (userInfo) {
+      const { name, phone } = JSON.parse(userInfo);
+      setCustomerName(name || '');
+      setCustomerPhone(phone || '');
+    }
+
     // Timer pour reset le panier après 15 minutes d'inactivité
     let inactivityTimer;
     const resetTimer = () => {
@@ -91,6 +99,9 @@ const CartModal = ({ isOpen, onClose }) => {
     if (res.ok) {
       const createdOrder = await res.json();
       console.log('✅ Order created:', createdOrder);
+      // Save user info to localStorage
+      const userInfo = { name: customerName.trim(), phone: customerPhone.replace(/\s/g, '') };
+      localStorage.setItem('userInfo', JSON.stringify(userInfo));
       cart.clear();
       // Stocker l'ID de commande dans sessionStorage pour plus de sécurité
       sessionStorage.setItem('pendingOrderId', createdOrder.id);
