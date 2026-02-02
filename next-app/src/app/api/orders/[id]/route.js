@@ -11,6 +11,7 @@ const pool = new Pool({
 
 export async function GET(request, { params }) {
   const { id } = params;
+  console.log('📡 GET /api/orders/[id] called with id:', id);
   const client = await pool.connect();
   try {
     const query = `
@@ -41,12 +42,16 @@ export async function GET(request, { params }) {
       GROUP BY o.id, u.id, u.name, u.email
       LIMIT 1
     `;
+    console.log('📡 Executing query for id:', id);
     const result = await client.query(query, [id]);
+    console.log('📡 Query result rows count:', result.rows.length);
     if (result.rows.length === 0) {
+      console.log('📡 No order found for id:', id);
       client.release();
       return NextResponse.json({ error: 'Commande non trouvée' }, { status: 404 });
     }
     const row = result.rows[0];
+    console.log('📡 Order found, id:', row.id);
     const order = {
       id: row.id,
       userId: row.userId,
@@ -67,10 +72,11 @@ export async function GET(request, { params }) {
       orderItems: row.order_items && row.order_items[0].id ? row.order_items : []
     };
     client.release();
+    console.log('📡 Returning order with id:', order.id);
     return NextResponse.json(order);
   } catch (error) {
+    console.error('❌ Error in GET /api/orders/[id]:', error);
     client.release();
-    console.error('Erreur lors de la récupération de la commande:', error);
     return NextResponse.json({ error: 'Erreur lors de la récupération de la commande' }, { status: 500 });
   }
 }
