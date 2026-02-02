@@ -14,6 +14,19 @@ export async function GET(request, { params }) {
   console.log('📡 GET /api/orders/[id] called with id:', id);
   const client = await pool.connect();
   try {
+    // First, check if the order exists with a simple query
+    const simpleQuery = 'SELECT id, "customerName", status FROM orders WHERE id = $1';
+    console.log('📡 Executing simple query for id:', id);
+    const simpleResult = await client.query(simpleQuery, [id]);
+    console.log('📡 Simple query result rows:', simpleResult.rows.length, simpleResult.rows);
+
+    if (simpleResult.rows.length === 0) {
+      console.log('📡 Order not found in simple query');
+      client.release();
+      return NextResponse.json({ error: 'Commande non trouvée' }, { status: 404 });
+    }
+
+    // Now do the complex query
     const query = `
       SELECT 
         o.*,
@@ -42,11 +55,11 @@ export async function GET(request, { params }) {
       GROUP BY o.id, u.id, u.name, u.email
       LIMIT 1
     `;
-    console.log('📡 Executing query for id:', id);
+    console.log('📡 Executing complex query for id:', id);
     const result = await client.query(query, [id]);
-    console.log('📡 Query result rows count:', result.rows.length);
+    console.log('📡 Complex query result rows count:', result.rows.length);
     if (result.rows.length === 0) {
-      console.log('📡 No order found for id:', id);
+      console.log('📡 No order found in complex query');
       client.release();
       return NextResponse.json({ error: 'Commande non trouvée' }, { status: 404 });
     }
@@ -69,7 +82,7 @@ export async function GET(request, { params }) {
         name: row.user_name,
         email: row.user_email
       } : null,
-      orderItems: row.order_items && row.order_items[0].id ? row.order_items : []
+      orderItems: row.order_items && row.order_items[0] && row.order_items[0].id ? row.order_items : []
     };
     client.release();
     console.log('📡 Returning order with id:', order.id);
