@@ -17,14 +17,6 @@ const CartModal = ({ isOpen, onClose }) => {
     const update = items => setCartItems([...items]);
     cart.addListener(update);
 
-    // Load user info from localStorage
-    const userInfo = typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
-    if (userInfo) {
-      const { name, phone } = JSON.parse(userInfo);
-      setCustomerName(name || '');
-      setCustomerPhone(phone || '');
-    }
-
     // Timer pour reset le panier après 15 minutes d'inactivité
     let inactivityTimer;
     const resetTimer = () => {
