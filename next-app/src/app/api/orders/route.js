@@ -77,14 +77,19 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const client = await pool.connect();
+  let client;
   try {
+    console.log('📋 Nouvelle requête POST /api/orders');
+
     const orderData = await request.json();
-    
-    console.log('📋 Données commande reçues:', orderData);
+    console.log('📋 Données commande reçues:', JSON.stringify(orderData, null, 2));
+
+    client = await pool.connect();
+    console.log('✅ Connexion DB établie');
 
     // Commencer une transaction
     await client.query('BEGIN');
+    console.log('🔄 Transaction démarrée');
 
     // Créer la commande
     const orderQuery = `
@@ -107,14 +112,17 @@ export async function POST(request) {
       Math.round(parseFloat(orderData.totalAmount) * 100) // Convertir en centimes pour integer
     ];
 
+    console.log('📝 Valeurs commande:', orderValues);
+
     const orderResult = await client.query(orderQuery, orderValues);
     const order = orderResult.rows[0];
-
-    console.log('✅ Commande créée:', order.id);
+    console.log('✅ Commande créée avec ID:', order.id);
 
     // Créer les items de la commande
     if (orderData.items && orderData.items.length > 0) {
+      console.log(`📦 Création de ${orderData.items.length} items`);
       for (const item of orderData.items) {
+        console.log('📦 Item:', item);
         const itemQuery = `
           INSERT INTO order_items ("orderId", "productId", quantity, "unitPrice", "createdAt")
           VALUES ($1, $2, $3, $4, NOW())
@@ -128,14 +136,15 @@ export async function POST(request) {
           Math.round(parseFloat(item.unitPrice) * 100) // Convertir en centimes
         ];
 
+        console.log('📝 Valeurs item:', itemValues);
         await client.query(itemQuery, itemValues);
       }
-      
-      console.log('✅ Items créés:', orderData.items.length);
+      console.log('✅ Items créés');
     }
 
     // Confirmer la transaction
     await client.query('COMMIT');
+    console.log('✅ Transaction validée');
 
     // Récupérer la commande complète avec items et produits
     const fullOrderQuery = `
@@ -178,13 +187,20 @@ export async function POST(request) {
     }, { status: 201 });
 
   } catch (error) {
-    // Annuler la transaction en cas d'erreur
-    await client.query('ROLLBACK');
-    client.release();
-    
     console.error('❌ Erreur lors de la création de commande:', error);
-    console.error('Détails:', error.message);
-    console.error('Stack:', error.stack);
+    console.error('❌ Message:', error.message);
+    console.error('❌ Stack:', error.stack);
+
+    // Annuler la transaction en cas d'erreur
+    if (client) {
+      try {
+        await client.query('ROLLBACK');
+        console.log('🔄 Transaction annulée');
+      } catch (rollbackError) {
+        console.error('❌ Erreur rollback:', rollbackError);
+      }
+      client.release();
+    }
     
     return NextResponse.json(
       { 

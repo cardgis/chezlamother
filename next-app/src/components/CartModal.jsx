@@ -64,6 +64,7 @@ const CartModal = ({ isOpen, onClose }) => {
     setFormErrors({});
 
     console.log('🛒 Submitting order...');
+    console.log('🛒 Cart items:', cartItems);
 
     const totalAmount = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     const newOrder = {
@@ -78,35 +79,49 @@ const CartModal = ({ isOpen, onClose }) => {
       }))
     };
 
-    console.log('📦 Order data:', newOrder);
+    console.log('📦 Order data to send:', JSON.stringify(newOrder, null, 2));
 
-    const res = await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newOrder)
-    });
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      });
 
-    console.log('📡 Order creation response:', res.status);
+      console.log('📡 Order creation response status:', res.status);
+      console.log('📡 Response headers:', Object.fromEntries(res.headers.entries()));
 
-    if (res.ok) {
-      const createdOrder = await res.json();
-      console.log('✅ Order created:', createdOrder);
-      // Save user info to localStorage
-      const userInfo = { name: customerName.trim(), phone: customerPhone.replace(/\s/g, '') };
-      localStorage.setItem('userInfo', JSON.stringify(userInfo));
-      cart.clear();
-      // Stocker l'ID de commande dans sessionStorage pour plus de sécurité
-      sessionStorage.setItem('pendingOrderId', createdOrder.id);
-      console.log('💾 SessionStorage set:', createdOrder.id);
-      window.location.href = '/paiement';
-    } else {
-      let errorMsg = "Erreur lors de l'enregistrement de la commande. Veuillez réessayer ou contacter le restaurant.";
-      try {
-        const err = await res.json();
-        if (err && err.error) errorMsg += "\n" + err.error;
-      } catch {}
-      console.log('❌ Order creation failed:', errorMsg);
-      setOrderError(errorMsg);
+      const responseText = await res.text();
+      console.log('📡 Raw response:', responseText);
+
+      if (res.ok) {
+        const createdOrder = JSON.parse(responseText);
+        console.log('✅ Order created successfully:', createdOrder);
+        // Save user info to localStorage
+        const userInfo = { name: customerName.trim(), phone: customerPhone.replace(/\s/g, '') };
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        cart.clear();
+        // Stocker l'ID de commande dans sessionStorage pour plus de sécurité
+        sessionStorage.setItem('pendingOrderId', createdOrder.id);
+        console.log('💾 SessionStorage set:', createdOrder.id);
+        window.location.href = '/paiement';
+      } else {
+        let errorMsg = "Erreur lors de l'enregistrement de la commande.";
+        try {
+          const err = JSON.parse(responseText);
+          console.log('❌ Error response:', err);
+          if (err && err.error) errorMsg += "\n" + err.error;
+          if (err && err.details) errorMsg += "\nDétails: " + err.details;
+        } catch (parseError) {
+          console.log('❌ Could not parse error response:', parseError);
+          errorMsg += "\nRéponse brute: " + responseText;
+        }
+        console.log('❌ Order creation failed:', errorMsg);
+        setOrderError(errorMsg);
+      }
+    } catch (networkError) {
+      console.error('❌ Network error:', networkError);
+      setOrderError("Erreur de connexion. Vérifiez votre connexion internet.");
     }
   };
 
