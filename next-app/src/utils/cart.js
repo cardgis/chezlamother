@@ -76,6 +76,12 @@ export class CartManager {
     return this.items;
   }
 
+  // Debug method to check cart contents
+  debug() {
+    console.log('Cart contents:', this.items);
+    return this.items;
+  }
+
   getItems() {
     return [...this.items];
   }
